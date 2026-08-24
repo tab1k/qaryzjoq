@@ -7,9 +7,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# зависимости отдельным слоем — кешируются между сборками
+# Зависимости отдельным слоем — кешируются между сборками.
+#
+# --trusted-host нужен там, где провайдер перехватывает TLS и pip не может
+# проверить сертификат pypi.org. Целостность пакетов при этом гарантируют
+# sha256-хеши из requirements.txt: подменённый файл просто не установится.
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --require-hashes \
+        --trusted-host pypi.org \
+        --trusted-host files.pythonhosted.org \
+        --trusted-host pypi.python.org \
+        -r requirements.txt
 
 COPY src ./src
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

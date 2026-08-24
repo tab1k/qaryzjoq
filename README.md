@@ -77,6 +77,44 @@ server {
 
 Далее `certbot --nginx -d qaryzjoq.kz -d www.qaryzjoq.kz`, после чего в `.env` ставим `DJANGO_USE_HTTPS=True` и `docker compose up -d`.
 
+### Если сборка падает на TLS-сертификатах
+
+На некоторых серверах провайдер подменяет сертификаты, и pip/docker не могут
+проверить цепочку (`certificate verify failed`, `certificate signed by unknown authority`).
+
+В `Dockerfile` для pip уже указаны `--trusted-host` вместе с `--require-hashes`,
+поэтому пакеты качаются даже при перехвате, а их подлинность проверяется
+по sha256 из `requirements.txt`.
+
+Посмотреть, кто выдаёт сертификат (если это прокси — имя будет незнакомым):
+
+```bash
+docker run --rm python:3.12-slim python -c \
+  "import ssl,socket;c=ssl.create_default_context();c.check_hostname=False;c.verify_mode=ssl.CERT_NONE;\
+s=c.wrap_socket(socket.socket(),server_hostname='pypi.org');s.connect(('pypi.org',443));print(s.getpeercert(True) and 'соединение есть')"
+```
+
+Правильное решение — добавить корневой сертификат прокси в доверенные на хосте:
+
+```bash
+cp proxy-ca.crt /usr/local/share/ca-certificates/
+update-ca-certificates
+systemctl restart docker
+```
+
+**План Б — собрать образ на своей машине и перенести файлом** (сеть сервера не нужна вообще):
+
+```bash
+# локально
+docker build -t qaryzjoq-web .
+docker save qaryzjoq-web | gzip > qaryzjoq-web.tar.gz
+scp qaryzjoq-web.tar.gz root@сервер:~/qaryzjoq/
+
+# на сервере
+docker load < qaryzjoq-web.tar.gz
+docker compose up -d          # build не нужен, образ уже есть
+```
+
 ### Если менялись зависимости
 
 `requirements.txt` собирается из `uv.lock`, обновлять так:
