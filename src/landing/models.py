@@ -13,6 +13,11 @@ class Lead(models.Model):
     phone = models.CharField('Телефон', max_length=32)
     debt = models.CharField('Сумма долга', max_length=64, blank=True)
     message = models.TextField('Сообщение', blank=True)
+    calc_debt = models.BigIntegerField('Расчёт: сумма кредитов', null=True, blank=True)
+    calc_payments = models.BigIntegerField('Расчёт: платежи в месяц', null=True, blank=True)
+    calc_income = models.BigIntegerField('Расчёт: официальный доход', null=True, blank=True)
+    calc_result = models.BigIntegerField('Расчёт: новый платёж', null=True, blank=True)
+
     status = models.CharField('Статус', max_length=16, choices=Status.choices, default=Status.NEW)
     created_at = models.DateTimeField('Создана', auto_now_add=True)
 
@@ -23,3 +28,7 @@ class Lead(models.Model):
 
     def __str__(self):
         return f'{self.name} — {self.phone}'
+
+    @property
+    def has_calc(self):
+        return self.calc_debt is not None

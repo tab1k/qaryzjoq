@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}QARYZ JOQ — платите в 3 раза меньше за свои кредиты{% endblock %}
+{% block description %}Восстановление платёжеспособности: снижаем ежемесячный платёж по кредитам в 2–3 раза. Рассчитайте новый платёж за 1 минуту.{% endblock %}
+
 {% block content %}
 
 <!-- ШАПКА -->
@@ -8,16 +11,32 @@
   <div class="wrap">
     <nav class="nav">
       <a href="#top" class="nav-logo"><img src="{% static 'brand/logo-lockup.png' %}" alt="QARYZ JOQ"></a>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#services">Услуги</a></li>
-        <li><a href="#cases">Кейсы</a></li>
-        <li><a href="#pricing">Цены</a></li>
-        <li><a href="#faq">Вопросы</a></li>
-        <li><a href="#contact">Контакты</a></li>
-      </ul>
-      <a href="tel:+77000000000" class="nav-phone">+7 700 000 00 00</a>
-      <a href="#contact" class="btn btn-green btn-sm">Бесплатная консультация</a>
-      <button class="nav-burger" id="navBurger" aria-label="Меню"><span></span></button>
+
+      <div class="nav-panel" id="navPanel">
+        <div class="nav-panel-head">
+          <a href="#top" class="nav-panel-logo"><img src="{% static 'brand/logo-lockup.png' %}" alt="QARYZ JOQ"></a>
+          <button type="button" class="nav-panel-close" id="navClose" aria-label="Закрыть меню">&times;</button>
+        </div>
+
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="#top" class="is-active">Главная</a></li>
+          <li><a href="#how">Как это работает</a></li>
+          <li><a href="#terms">Сколько длится работа</a></li>
+          <li><a href="#clients">Наши клиенты</a></li>
+          <li><a href="#calc">Калькулятор</a></li>
+        </ul>
+
+        <div class="nav-panel-foot">
+          <a href="tel:+77080903480" class="nav-panel-phone">+7 (708) 090 34 80</a>
+          <p>Ежедневно с 9:00 до 20:00</p>
+          <button type="button" class="btn btn-accent btn-block" data-modal-open>Бесплатная консультация</button>
+        </div>
+      </div>
+
+      <div class="nav-side">
+        <a href="#calc" class="btn btn-accent btn-sm">Рассчитать платёж</a>
+        <button class="nav-burger" id="navBurger" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
     </nav>
   </div>
 </div>
@@ -25,279 +44,231 @@
 <!-- ГЕРОЙ -->
 <header class="hero">
   <img class="blob blob-main" src="{% static 'img/Mask group.png' %}" alt="" aria-hidden="true">
-  <img class="deco deco-zigzag" src="{% static 'img/Untitled@2-1536x735 (1) 1.png' %}" alt="" aria-hidden="true">
+  <img class="deco deco-shape m-zigzag" src="{% static 'img/Untitled@2-1536x735 (1) 1.png' %}" alt="" aria-hidden="true">
+  <img class="deco deco-shape m-asterisk" src="{% static 'img/Untitled@2-1536x735 (2) 1.png' %}" alt="" aria-hidden="true">
   <div class="wrap hero-inner">
-    <span class="eyebrow">Работаем по закону РК «О восстановлении платёжеспособности»</span>
-    <h1>Спишем ваши долги <em>законно</em></h1>
-    <p class="lead">Ведём процедуру банкротства физических лиц под ключ: от анализа ситуации до решения суда. Коллекторы перестают звонить уже на первом этапе.</p>
-    <div class="hero-cta">
-      <a href="#contact" class="btn btn-dark">Проверить, спишут ли долг</a>
-      <a href="#cases" class="btn btn-yellow">Смотреть кейсы</a>
+    <h1 class="h-display">Платите <em class="hl">в 3 раза</em> меньше за свои кредиты</h1>
+
+    <div class="hero-sub">
+      <p class="lead">через процедуру восстановления платежеспособности</p>
+      <div class="hero-socials">
+        <a href="https://wa.me/77080903480" target="_blank" rel="noopener" aria-label="WhatsApp"><img src="{% static 'icon-whatsapp.svg' %}" alt="WhatsApp"></a>
+        <a href="https://www.instagram.com/qaryzjoq.kz" target="_blank" rel="noopener" aria-label="Instagram"><img src="{% static 'icon-instagram.svg' %}" alt="Instagram"></a>
+      </div>
     </div>
-    <div class="hero-stats">
-      <div><b>1 240+</b><span>завершённых дел</span></div>
-      <div><b>3,8 млрд ₸</b><span>списано клиентам</span></div>
-      <div><b>98%</b><span>дел с решением в пользу клиента</span></div>
-      <div><b>7 лет</b><span>практики в Казахстане</span></div>
+
+    <a href="#calc" class="btn btn-dark">Рассчитать новый платеж за 1 минуту</a>
+
+    <div class="note">
+      <b>ВАЖНО!</b>
+      <p>Сумма долга должна быть больше 4 млн тг</p>
+      <p>Должен быть официальный доход</p>
     </div>
+
+    <a href="#how" class="scroll-down">Как это работает?<span aria-hidden="true">↓</span></a>
   </div>
 </header>
 
-<!-- УСЛУГИ -->
-<section class="section" id="services">
-  <div class="wrap">
-    <div class="section-head">
-      <h2 class="h-section">Что мы делаем</h2>
-      <p class="lead" style="margin-top:14px">Полный спектр работы с задолженностью — подбираем процедуру под вашу ситуацию, а не наоборот.</p>
-    </div>
-
-    <div class="grid-services">
-      <article class="svc">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 7v6c0 4.4 3.4 8.2 8 9 4.6-.8 8-4.6 8-9V7l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>
-        </div>
-        <h3 class="h-card">Внесудебное банкротство</h3>
-        <p class="muted">Долг до 1 600 МРП без имущества — списываем через ЦОН, без суда и госпошлин.</p>
-      </article>
-
-      <article class="svc">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M12 3 3 9h18l-9-6Z"/><path d="M6 9v9M12 9v9M18 9v9"/></svg>
-        </div>
-        <h3 class="h-card">Судебное банкротство</h3>
-        <p class="muted">Готовим заявление, сопровождаем финуправляющего и защищаем вас на каждом заседании.</p>
-      </article>
-
-      <article class="svc">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-5 3 3 5-7"/></svg>
-        </div>
-        <h3 class="h-card">Восстановление платёжеспособности</h3>
-        <p class="muted">План на 5 лет с посильным графиком: сохраняете имущество и гасите долг без давления.</p>
-      </article>
-
-      <article class="svc svc-accent">
-        <img src="{% static 'brand/logo-mark.png' %}" alt="QARYZ JOQ">
-      </article>
-
-      <article class="svc svc-photo">
-        <img class="deco deco-burst" src="{% static 'img/Untitled@3-1536x735 1.png' %}" alt="" aria-hidden="true">
-        <h3 class="h-card" style="position:relative;z-index:2">Защита от коллекторов</h3>
-        <p class="muted" style="position:relative;z-index:2">Переводим всё общение на себя: звонки родственникам и на работу прекращаются.</p>
-      </article>
-
-      <article class="svc">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>
-        </div>
-        <h3 class="h-card">Реструктуризация кредитов</h3>
-        <p class="muted">Договариваемся с банками и МФО: снижаем платёж, убираем пени и штрафы.</p>
-      </article>
-
-      <article class="svc">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7 9 18l-5-5"/><path d="M14 4h6v6"/></svg>
-        </div>
-        <h3 class="h-card">Снятие арестов и ограничений</h3>
-        <p class="muted">Отменяем запрет на выезд, разблокируем счета и снимаем аресты приставов.</p>
-      </article>
-
-      <article class="svc">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
-        </div>
-        <h3 class="h-card">Сопровождение после списания</h3>
-        <p class="muted">Проверяем базы, закрываем исполнительные производства и восстанавливаем кредитную историю.</p>
-      </article>
+<!-- КАК ЭТО РАБОТАЕТ -->
+<section class="section" id="how">
+  <img class="deco deco-shape m-spiral" src="{% static 'img/Untitled@2-1536x735 1.png' %}" alt="" aria-hidden="true">
+  <div class="wrap pitch">
+    <h2 class="h-section">Это не банкротство</h2>
+    <div class="pitch-text">
+      <p class="pitch-lead">Вы также сможете брать кредиты и сохраните вашу кредитную историю</p>
+      <p>Мы уменьшаем переплату по вашим кредитам, а оставшуюся сумму долга распределяем на более долгий срок. При этом новая переплата не начисляется. За счёт этого ежемесячный платёж можно снизить в 2–3 раза.</p>
     </div>
   </div>
 </section>
 
-<!-- КЕЙСЫ -->
-<section class="section" id="cases" style="padding-top:0">
+<!-- СКОЛЬКО ДЛИТСЯ РАБОТА -->
+<section class="section" id="terms">
+  <img class="deco deco-shape m-burst" src="{% static 'img/Untitled@3-1536x735 1.png' %}" alt="" aria-hidden="true">
+  <div class="wrap pitch">
+    <h2 class="h-section">Сколько длится работа?</h2>
+    <div class="pitch-text">
+      <p class="pitch-lead">От 2 до 5 месяцев</p>
+      <p>Пока мы ведём работу, вам будут предоставлены <b>«кредитные каникулы»</b>.</p>
+      <p>То есть вы отдыхаете от кредитов и не платите за них.</p>
+    </div>
+  </div>
+
+  <div class="wrap cta-block">
+    <a href="#calc" class="btn btn-accent">Рассчитать новый платеж за 1 минуту</a>
+    <div class="note">
+      <b>ВАЖНО!</b>
+      <p>Сумма долга должна быть больше 4 млн тг</p>
+      <p>Должен быть официальный доход</p>
+    </div>
+    <a href="#clients" class="scroll-down">Наши клиенты<span aria-hidden="true">↓</span></a>
+  </div>
+</section>
+
+<!-- НАШИ КЛИЕНТЫ -->
+<section class="section work" id="clients">
+  <img class="deco deco-burst" src="{% static 'img/Untitled@3-1536x735 1.png' %}" alt="" aria-hidden="true">
   <div class="wrap">
-    <div class="section-head" style="text-align:center">
-      <h2 class="h-section">Наши кейсы</h2>
+    <div class="section-head center">
+      <h2 class="h-section">Наши клиенты</h2>
     </div>
 
-    <div class="cases">
-      <article class="case case--dark">
-        <span class="case-label">Алматы · 2025</span>
-        <div class="case-amount"><s>7 200 000 ₸</s>Списано полностью</div>
-        <p class="muted">4 кредита и 2 микрозайма. Внесудебная процедура, 6 месяцев.</p>
-        <div class="case-meta"><span class="chip">Без суда</span><span class="chip">6 мес.</span></div>
-        <div class="case-bar"><i style="width:100%"></i></div>
-      </article>
+    <div class="work-row">
+      <button class="arrow" type="button" data-slide="-1" aria-label="Назад">←</button>
 
-      <article class="case case--main">
-        <span class="case-label">Астана · 2025</span>
-        <div class="case-amount"><s>18 400 000 ₸</s>Списано 18 400 000 ₸</div>
-        <p class="muted">Ипотека и потребительские кредиты после потери бизнеса. Судебное банкротство: имущество супруги сохранено, исполнительные производства закрыты.</p>
-        <div class="case-meta"><span class="chip">Судебное банкротство</span><span class="chip">11 мес.</span><span class="chip">Имущество сохранено</span></div>
-        <div class="case-bar"><i style="width:100%"></i></div>
-      </article>
+      <div class="slider" id="slider">
+        <article class="slide"><span class="slide-badge">Видео</span><p>Отзыв клиента</p></article>
+        <article class="slide"><span class="slide-badge">Фото</span><p>Отзыв клиента</p></article>
+        <article class="slide is-active"><span class="slide-badge">Видео</span><p>Отзыв клиента</p></article>
+        <article class="slide"><span class="slide-badge">Фото</span><p>Отзыв клиента</p></article>
+        <article class="slide"><span class="slide-badge">Видео</span><p>Отзыв клиента</p></article>
+      </div>
 
-      <article class="case">
-        <span class="case-label">Шымкент · 2024</span>
-        <div class="case-amount"><s>3 100 000 ₸</s>Долг снижен на 74%</div>
-        <p class="muted">МФО и штрафы. Реструктуризация с отменой пеней.</p>
-        <div class="case-meta"><span class="chip">Реструктуризация</span><span class="chip">4 мес.</span></div>
-        <div class="case-bar"><i style="width:74%"></i></div>
-      </article>
+      <button class="arrow" type="button" data-slide="1" aria-label="Вперёд">→</button>
     </div>
 
-    <div class="section-nav">
-      <button type="button" aria-label="Назад">←</button>
-      <button type="button" aria-label="Вперёд">→</button>
-    </div>
+    <div class="dots" id="sliderDots"></div>
+  </div>
 
-    <div class="trust">
-      <div class="avatars"><span>А</span><span>Д</span><span>М</span><span>Н</span></div>
-      <p class="trust-text">Более <b>1 240 клиентов</b> уже вышли из долгов вместе с QARYZ JOQ</p>
+  <div class="wrap cta-block">
+    <a href="#calc" class="btn btn-accent">Рассчитать новый платеж за 1 минуту</a>
+    <div class="note">
+      <b>ВАЖНО!</b>
+      <p>Сумма долга должна быть больше 4 млн тг</p>
+      <p>Должен быть официальный доход</p>
     </div>
   </div>
 </section>
 
-<!-- ЦЕНЫ -->
-<section class="section" id="pricing">
-  <div class="wrap pricing">
+<!-- КАЛЬКУЛЯТОР -->
+<section class="section" id="calc">
+  <img class="deco deco-shape m-zigzag2" src="{% static 'img/Untitled@2-1536x735 (1) 1.png' %}" alt="" aria-hidden="true">
+  <img class="deco deco-shape m-spiral2" src="{% static 'img/Untitled@2-1536x735 1.png' %}" alt="" aria-hidden="true">
+  <div class="wrap calc">
     <div>
-      <h2 class="h-section">Стоимость</h2>
-      <p class="lead" style="margin-top:16px">Фиксированная цена в договоре и оплата частями. Если по вашей ситуации списание невозможно — мы честно скажем об этом на бесплатной консультации.</p>
-
-      <div class="meet-card">
-        <h3>Записаться на консультацию</h3>
-        <p class="muted">30 минут с юристом: разбираем документы и считаем перспективу списания.</p>
-        <a href="#contact" class="btn btn-green btn-block">Выбрать время</a>
+      <h2 class="h-section">Рассчитать новый платеж за 1 минуту</h2>
+      <div class="note note-left">
+        <b>Важно!</b>
+        <p>— Сумма долга должна быть больше 4 млн тг.</p>
+        <p>— Должен быть официальный доход.</p>
+        <p>— Не подойдёт пенсионерам.</p>
+        <p>— Не подойдёт, если у вас только ипотека или только кредит на машину.</p>
       </div>
     </div>
 
-    <div class="price-card">
-      <h3>Банкротство под ключ</h3>
-      <ul class="price-list">
-        <li>Анализ долгов и рисков</li>
-        <li>Сбор всех документов</li>
-        <li>Подача заявления</li>
-        <li>Работа с финуправляющим</li>
-        <li>Представительство в суде</li>
-        <li>Общение с банками и МФО</li>
-        <li>Снятие арестов и запретов</li>
-        <li>Отчёт после завершения дела</li>
-      </ul>
-      <div class="price-row">
-        <div class="price-value">от 350 000 ₸<br><span>рассрочка до 12 месяцев</span></div>
-        <a href="#contact" class="btn btn-dark">Рассчитать стоимость</a>
+    <form class="calc-card" id="calcForm" novalidate>
+      <div class="calc-pane" id="calcFields">
+        <div class="field">
+          <label for="calcDebt">Введите общую сумму ваших кредитов</label>
+          <input type="text" id="calcDebt" inputmode="numeric" placeholder="4 500 000" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="calcPay">Введите общую сумму ежемесячных платежей</label>
+          <input type="text" id="calcPay" inputmode="numeric" placeholder="180 000" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="calcIncome">Введите ваш официальный доход</label>
+          <input type="text" id="calcIncome" inputmode="numeric" placeholder="350 000" autocomplete="off">
+        </div>
+
+        <button type="submit" class="btn btn-accent btn-block">Расчитать</button>
+        <p class="calc-error" id="calcError" hidden>Укажите сумму кредитов, чтобы сделать расчёт.</p>
       </div>
-    </div>
+
+      <div class="calc-pane calc-loader" id="calcLoader" hidden>
+        <div class="loader-ring">
+          <svg viewBox="0 0 76 76" aria-hidden="true">
+            <circle class="ring-bg" cx="38" cy="38" r="34"/>
+            <circle class="ring-fg" cx="38" cy="38" r="34" id="calcRing"/>
+          </svg>
+          <span class="loader-pct" id="calcPct">0%</span>
+        </div>
+
+        <ul class="loader-steps" id="calcSteps">
+          <li>Проверяем сумму долга</li>
+          <li>Пересчитываем переплату</li>
+          <li>Формируем новый платёж</li>
+        </ul>
+      </div>
+    </form>
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="section" id="faq" style="padding-top:0">
-  <div class="wrap faq">
-    <img class="deco deco-spiral" src="{% static 'img/Untitled@2-1536x735 1.png' %}" alt="" aria-hidden="true">
-    <h2 class="h-section" style="position:relative;z-index:2">Частые<br>вопросы</h2>
+<!-- МОДАЛЬНОЕ ОКНО -->
+<div class="modal" id="leadModal" hidden>
+  <div class="modal-backdrop" data-modal-close></div>
 
-    <div class="acc">
-      <div class="acc-item">
-        <button class="acc-q" type="button">Какие долги можно списать? <i>+</i></button>
-        <div class="acc-a"><p>Кредиты банков, микрозаймы, долги по кредитным картам, штрафы и пени по ним. Не списываются алименты, возмещение вреда жизни и здоровью и долги, возникшие в результате мошенничества.</p></div>
-      </div>
-      <div class="acc-item">
-        <button class="acc-q" type="button">Заберут ли единственное жильё? <i>+</i></button>
-        <div class="acc-a"><p>Единственное жильё, не находящееся в залоге, не включается в конкурсную массу. По залоговому имуществу разбираем варианты индивидуально — часто удаётся договориться с банком до подачи заявления.</p></div>
-      </div>
-      <div class="acc-item">
-        <button class="acc-q" type="button">Сколько длится процедура? <i>+</i></button>
-        <div class="acc-a"><p>Внесудебное банкротство — около 6 месяцев с момента подачи. Судебное — от 9 до 12 месяцев в зависимости от количества кредиторов и наличия имущества.</p></div>
-      </div>
-      <div class="acc-item">
-        <button class="acc-q" type="button">Что будет с кредитной историей? <i>+</i></button>
-        <div class="acc-a"><p>Пять лет после банкротства действует ограничение на новые займы. Зато исчезает просрочка, закрываются исполнительные производства, и через этот срок история начинается с чистого листа.</p></div>
-      </div>
-      <div class="acc-item">
-        <button class="acc-q" type="button">Могут ли отказать в банкротстве? <i>+</i></button>
-        <div class="acc-a"><p>Да — например, если вы применяли процедуру за последние 7 лет, скрыли имущество или совершали сделки по выводу активов. Мы проверяем все эти основания до подачи и предупреждаем о рисках заранее.</p></div>
-      </div>
-      <div class="acc-item">
-        <button class="acc-q" type="button">Как оплачиваются ваши услуги? <i>+</i></button>
-        <div class="acc-a"><p>По договору с фиксированной суммой. Первый платёж — при старте работ, остальное разбивается на равные платежи до 12 месяцев. Скрытых доплат в процессе нет.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <img class="modal-blob" src="{% static 'img/Mask group.png' %}" alt="" aria-hidden="true">
+    <button type="button" class="modal-close" data-modal-close aria-label="Закрыть">&times;</button>
 
-<!-- КОНТАКТЫ -->
-<section class="section contact" id="contact">
-  <img class="deco deco-burst" src="{% static 'img/Untitled@2-1536x735 (2) 1.png' %}" alt="" aria-hidden="true">
-  <div class="wrap">
-    <div class="section-head" style="text-align:center">
-      <h2 class="h-section">Оставьте заявку</h2>
-      <p class="lead" style="margin:14px auto 0;text-align:center">Юрист перезвонит в течение 15 минут и бесплатно оценит вашу ситуацию.</p>
-    </div>
+    <div class="modal-body">
+      <h3 id="modalTitle">Ваш новый ежемесячный платеж будет составлять</h3>
+      <div class="modal-sum" id="modalSum" hidden>0 ₸<span>в месяц</span></div>
 
-    <div class="contact-card">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
+      <p>Получите бесплатную консультацию от специалиста, чтобы приступить к снижению платежа</p>
 
-      <form method="post" action="{% url 'landing:index' %}#contact" novalidate>
+      <form method="post" action="{% url 'landing:index' %}" id="modalForm" novalidate>
         {% csrf_token %}
-        {% for field in form %}
+        {% for field in modal_form.visible_fields %}{% if field.name == 'name' or field.name == 'phone' %}
           <div class="field">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <label for="{{ field.id_for_label }}">{% if field.name == 'name' %}Введите ваше имя{% else %}Введите ваш номер телефона (ватсапп){% endif %}</label>
             {{ field }}
-            {{ field.errors }}
+            <ul class="errorlist" data-error-for="{{ field.name }}"></ul>
           </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-green btn-block">Получить бесплатную консультацию</button>
-        <p class="form-note muted">Нажимая кнопку, вы соглашаетесь с <a href="#">политикой обработки персональных данных</a></p>
+        {% endif %}{% endfor %}
+        {% for field in modal_form.hidden_fields %}{{ field }}{% endfor %}
+
+        <button type="submit" class="btn btn-accent btn-block">Отправить</button>
       </form>
     </div>
+
+    <div class="modal-done" hidden>
+      <div class="modal-done-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3>Спасибо</h3>
+      <p>В рабочее время с вами свяжется наш специалист и проконсультирует вас</p>
+      <button type="button" class="btn btn-dark" data-modal-close>Закрыть</button>
+    </div>
   </div>
-</section>
+</div>
 
 <!-- ПОДВАЛ -->
 <footer class="footer">
+  <img class="deco deco-asterisk" src="{% static 'img/Untitled@2-1536x735 (2) 1.png' %}" alt="" aria-hidden="true">
+  <img class="deco deco-spiral-2" src="{% static 'img/Untitled@2-1536x735 (1) 1.png' %}" alt="" aria-hidden="true">
   <div class="wrap">
     <div class="footer-card">
       <img class="blob blob-foot" src="{% static 'img/Mask group.png' %}" alt="" aria-hidden="true">
-      <img class="deco deco-asterisk" src="{% static 'img/Untitled@2-1536x735 (2) 1.png' %}" alt="" aria-hidden="true">
 
-      <div class="footer-grid">
+      <div class="footer-top">
         <div class="footer-logo">
           <img src="{% static 'brand/logo-full.png' %}" alt="QARYZ JOQ — нет долгов">
-          <p class="muted" style="max-width:34ch">Юридическая компания по банкротству физических лиц. Работаем по всему Казахстану — онлайн и в офисе.</p>
+          <p>Снижаем ежемесячный платёж по кредитам через процедуру восстановления платежеспособности.</p>
         </div>
 
-        <div>
-          <h4>Компания</h4>
-          <ul>
-            <li><a href="#services">Услуги</a></li>
-            <li><a href="#cases">Кейсы</a></li>
-            <li><a href="#pricing">Цены</a></li>
-            <li><a href="#faq">Вопросы</a></li>
-          </ul>
-        </div>
+        <div class="footer-cols">
+          <nav class="footer-nav">
+            <a href="#how">Как это работает</a>
+            <a href="#terms">Сколько длится работа</a>
+            <a href="#clients">Наши клиенты</a>
+            <a href="#calc">Калькулятор</a>
+          </nav>
 
-        <div>
-          <h4>Контакты</h4>
-          <ul>
-            <li><a href="tel:+77000000000">+7 700 000 00 00</a></li>
-            <li><a href="mailto:info@qaryzjoq.kz">info@qaryzjoq.kz</a></li>
-            <li><a href="#">Алматы, пр. Абая, 00</a></li>
-            <li><a href="#contact">Записаться на консультацию</a></li>
-          </ul>
+          <div class="footer-contacts">
+            <a href="tel:+77080903480" class="footer-phone">+7 (708) 090 34 80</a>
+            <p>Ежедневно с 9:00 до 20:00</p>
+          </div>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <p class="muted">© {% now "Y" %} QARYZ JOQ. Все права защищены.</p>
+        <p>© {% now "Y" %} QARYZ JOQ. Все права защищены.<br>
+          <a href="tel:+77077772817" class="footer-author">Разработано Табигатом Карбаевым.</a>
+        </p>
         <div class="socials">
-          <a href="#" aria-label="Instagram"><img src="{% static 'icon-instagram.svg' %}" alt=""></a>
-          <a href="#" aria-label="WhatsApp"><img src="{% static 'icon-whatsapp.svg' %}" alt=""></a>
+          <a href="https://www.instagram.com/qaryzjoq.kz" target="_blank" rel="noopener" aria-label="Instagram"><img src="{% static 'icon-instagram.svg' %}" alt=""></a>
+          <a href="https://wa.me/77080903480" target="_blank" rel="noopener" aria-label="WhatsApp"><img src="{% static 'icon-whatsapp.svg' %}" alt=""></a>
         </div>
       </div>
     </div>
