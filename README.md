@@ -41,7 +41,9 @@ docker compose up -d --build
 docker compose logs -f web    # миграции, сборка статики, старт gunicorn
 ```
 
-Контейнер слушает `127.0.0.1:8000`. База (SQLite) лежит в docker-томе `db-data`, статика собирается внутрь образа при старте — пересборка данные не трогает.
+По умолчанию контейнер слушает `0.0.0.0:8000`, то есть сайт сразу доступен по `http://31.14.27.130:8000`
+(не забудьте `ufw allow 8000/tcp`). Когда перед ним встанет nginx — поменяйте в `docker-compose.yml`
+проброс на `"127.0.0.1:8000:8000"`, чтобы порт не торчал наружу. База (SQLite) лежит в docker-томе `db-data`, статика собирается внутрь образа при старте — пересборка данные не трогает.
 
 ### Обязательные переменные в `.env`
 
@@ -108,7 +110,7 @@ systemctl restart docker
 # локально
 docker build -t qaryzjoq-web .
 docker save qaryzjoq-web | gzip > qaryzjoq-web.tar.gz
-scp qaryzjoq-web.tar.gz root@сервер:~/qaryzjoq/
+scp qaryzjoq-web.tar.gz root@31.14.27.130:~/qaryzjoq/
 
 # на сервере
 docker load < qaryzjoq-web.tar.gz

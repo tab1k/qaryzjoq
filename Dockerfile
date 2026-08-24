@@ -24,9 +24,12 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # каталог для файла базы (в compose монтируется томом)
-RUN mkdir -p /data && \
-    adduser --system --group --no-create-home app && \
-    chown -R app:app /app /data
+# домашний каталог нужен gunicorn для управляющего сокета
+RUN mkdir -p /data /home/app && \
+    adduser --system --group --home /home/app app && \
+    chown -R app:app /app /data /home/app
+
+ENV HOME=/home/app
 
 USER app
 
