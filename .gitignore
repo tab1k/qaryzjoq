@@ -9,3 +9,9 @@ wheels/
 # Virtual environments
 .venv
 .env
+
+# Django
+*.sqlite3
+staticfiles/
+media/
+.DS_Store
