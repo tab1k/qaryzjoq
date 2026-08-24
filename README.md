@@ -4,7 +4,8 @@ Django 6 + gunicorn + WhiteNoise. Одностраничник с калькул
 
 ```
 .
-├── Dockerfile              сборка образа (uv, python 3.12-slim)
+├── Dockerfile              сборка образа (python 3.12-slim, pip)
+├── requirements.txt        зафиксированные зависимости (генерируется из uv.lock)
 ├── docker-compose.yml      запуск на сервере
 ├── docker-entrypoint.sh    миграции → статика → суперпользователь → gunicorn
 ├── .env.example            шаблон переменных окружения
@@ -75,6 +76,15 @@ server {
 ```
 
 Далее `certbot --nginx -d qaryzjoq.kz -d www.qaryzjoq.kz`, после чего в `.env` ставим `DJANGO_USE_HTTPS=True` и `docker compose up -d`.
+
+### Если менялись зависимости
+
+`requirements.txt` собирается из `uv.lock`, обновлять так:
+
+```bash
+uv lock
+uv export --frozen --no-dev --no-emit-project --format requirements.txt -o requirements.txt
+```
 
 ## Обновление
 
