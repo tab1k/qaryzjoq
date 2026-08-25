@@ -72,7 +72,7 @@ cd ~/qaryzjoq && docker compose up -d        # web уже подключаетс
 
 | Поле | Значение |
 |---|---|
-| Domain Names | qaryzjoq.kz, www.qaryzjoq.kz |
+| Domain Names | go.qaryzjoq.kz |
 | Scheme | http |
 | Forward Hostname | `qaryzjoq-web` |
 | Forward Port | `8000` |
@@ -83,7 +83,7 @@ cd ~/qaryzjoq && docker compose up -d        # web уже подключаетс
 
 **Чтобы сертификат выпустился, обязательно:**
 
-1. A-запись домена указывает на `31.14.27.130` — проверить: `dig +short qaryzjoq.kz`
+1. A-запись домена указывает на `31.14.27.130` — проверить: `dig +short go.qaryzjoq.kz`
 2. Порты 80 и 443 открыты и заняты именно контейнером NPM:
    ```bash
    ufw allow 80/tcp && ufw allow 443/tcp
@@ -99,8 +99,8 @@ cd ~/qaryzjoq && docker compose up -d        # web уже подключаетс
 
 ```
 DJANGO_USE_HTTPS=True
-DJANGO_ALLOWED_HOSTS=qaryzjoq.kz,www.qaryzjoq.kz,31.14.27.130,localhost,127.0.0.1
-DJANGO_CSRF_TRUSTED_ORIGINS=https://qaryzjoq.kz,https://www.qaryzjoq.kz
+DJANGO_ALLOWED_HOSTS=go.qaryzjoq.kz,31.14.27.130,localhost,127.0.0.1
+DJANGO_CSRF_TRUSTED_ORIGINS=https://go.qaryzjoq.kz
 ```
 
 и `docker compose up -d --force-recreate`. NPM передаёт `X-Forwarded-Proto`, Django это учитывает и не зациклит редиректы.
@@ -110,7 +110,7 @@ DJANGO_CSRF_TRUSTED_ORIGINS=https://qaryzjoq.kz,https://www.qaryzjoq.kz
 ```nginx
 server {
     listen 80;
-    server_name qaryzjoq.kz www.qaryzjoq.kz;
+    server_name go.qaryzjoq.kz;
 
     client_max_body_size 10m;
 
@@ -124,7 +124,7 @@ server {
 }
 ```
 
-Далее `certbot --nginx -d qaryzjoq.kz -d www.qaryzjoq.kz`, после чего в `.env` ставим `DJANGO_USE_HTTPS=True` и `docker compose up -d`.
+Далее `certbot --nginx -d go.qaryzjoq.kz`, после чего в `.env` ставим `DJANGO_USE_HTTPS=True` и `docker compose up -d`.
 
 ### Если сборка падает на TLS-сертификатах
 
