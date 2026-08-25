@@ -58,7 +58,54 @@ docker compose logs -f web    # миграции, сборка статики, �
 
 `DJANGO_USE_HTTPS=True` включает редирект на https, HSTS и secure-куки. Пока сертификата нет — оставьте `False`, иначе в админку не зайти.
 
-### nginx перед контейнером
+### Nginx Proxy Manager
+
+NPM работает в своём контейнере, поэтому до сайта он должен достучаться **по имени контейнера в общей docker-сети**, а не по `127.0.0.1` — внутри контейнера NPM это он сам.
+
+```bash
+docker network create proxy                 # один раз
+docker network connect proxy <контейнер-NPM>  # имя смотреть в docker ps
+cd ~/qaryzjoq && docker compose up -d        # web уже подключается к proxy
+```
+
+В NPM → Proxy Hosts → Add Proxy Host:
+
+| Поле | Значение |
+|---|---|
+| Domain Names | qaryzjoq.kz, www.qaryzjoq.kz |
+| Scheme | http |
+| Forward Hostname | `qaryzjoq-web` |
+| Forward Port | `8000` |
+| Block Common Exploits | включить |
+| Websockets Support | не нужно |
+
+Вкладка SSL → Request a new SSL Certificate → Force SSL + HTTP/2, согласиться с условиями Let's Encrypt.
+
+**Чтобы сертификат выпустился, обязательно:**
+
+1. A-запись домена указывает на `31.14.27.130` — проверить: `dig +short qaryzjoq.kz`
+2. Порты 80 и 443 открыты и заняты именно контейнером NPM:
+   ```bash
+   ufw allow 80/tcp && ufw allow 443/tcp
+   ss -tlnp | grep -E ':80 |:443 '
+   ```
+3. Ничего другого на 80 порту не висит (системный nginx, apache):
+   ```bash
+   systemctl stop nginx apache2 2>/dev/null; systemctl disable nginx apache2 2>/dev/null
+   ```
+4. Прокси-хост открывается по http **до** запроса сертификата — Let's Encrypt проверяет домен именно через порт 80.
+
+После выпуска сертификата в `.env`:
+
+```
+DJANGO_USE_HTTPS=True
+DJANGO_ALLOWED_HOSTS=qaryzjoq.kz,www.qaryzjoq.kz,31.14.27.130,localhost,127.0.0.1
+DJANGO_CSRF_TRUSTED_ORIGINS=https://qaryzjoq.kz,https://www.qaryzjoq.kz
+```
+
+и `docker compose up -d --force-recreate`. NPM передаёт `X-Forwarded-Proto`, Django это учитывает и не зациклит редиректы.
+
+### nginx перед контейнером (альтернатива, без NPM)
 
 ```nginx
 server {

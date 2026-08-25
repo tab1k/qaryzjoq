@@ -6,9 +6,12 @@ services:
     restart: unless-stopped
     env_file: .env
     ports:
-      # порт открыт наружу: сайт доступен по http://IP-сервера:8000
-      # когда перед контейнером встанет nginx — верните "127.0.0.1:8000:8000"
+      # прямой доступ по http://IP:8000 — удобно на этапе настройки.
+      # Когда заработает домен через Nginx Proxy Manager, строку можно удалить:
+      # NPM ходит в контейнер по сети proxy, наружу порт не нужен.
       - "8000:8000"
+    networks:
+      - proxy
     volumes:
       - db-data:/data           # файл SQLite переживает пересборку
     healthcheck:
@@ -17,6 +20,13 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
+
+# общая сеть с Nginx Proxy Manager: создать один раз командой
+#   docker network create proxy
+# и подключить к ней контейнер NPM
+networks:
+  proxy:
+    external: true
 
 volumes:
   db-data:
