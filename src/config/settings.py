@@ -7,6 +7,9 @@
 import os
 from pathlib import Path
 
+from django.templatetags.static import static
+from django.urls import reverse, reverse_lazy
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_DIR = BASE_DIR.parent
 
@@ -40,8 +43,16 @@ def env_list(name: str, default: str = '') -> list[str]:
 
 
 def env_path(name: str, default: Path) -> Path:
+    """Путь из переменной окружения.
+
+    Если каталога назначения нет (например, продовый .env с путями контейнера
+    открыли на локальной машине) — используем значение по умолчанию.
+    """
     value = env(name)
-    return Path(value) if value else default
+    if not value:
+        return default
+    path = Path(value)
+    return path if path.parent.exists() else default
 
 
 # --- базовое ---------------------------------------------------------------
@@ -59,12 +70,18 @@ CSRF_TRUSTED_ORIGINS = env_list('DJANGO_CSRF_TRUSTED_ORIGINS')
 # --- приложения ------------------------------------------------------------
 
 INSTALLED_APPS = [
+    # тема админки — строго до django.contrib.admin
+    'unfold',
+    'unfold.contrib.filters',
+    'unfold.contrib.forms',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     'landing',
 ]
@@ -98,6 +115,86 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+
+
+# --- админка ---------------------------------------------------------------
+
+UNFOLD = {
+    'SITE_TITLE': 'QARYZ JOQ',
+    'SITE_ICON': lambda request: static('brand/logo-mark.png'),
+    'SITE_LOGO': lambda request: static('brand/logo-lockup.png'),
+    'SITE_FAVICONS': [
+        {'rel': 'icon', 'sizes': '32x32', 'type': 'image/png', 'href': lambda request: static('brand/logo-mark.png')},
+    ],
+    'LOGIN': {
+        'image': lambda request: static('img/Mask group.png'),
+    },
+    'SITE_HEADER': 'QARYZ JOQ — заявки',
+    'SITE_SUBHEADER': 'Панель управления сайтом',
+    'SITE_URL': '/',
+    'SITE_SYMBOL': 'request_quote',
+    'SHOW_HISTORY': True,
+    'SHOW_VIEW_ON_SITE': False,
+    'COLORS': {
+        # фирменный зелёный в оттенках, которые ждёт тема
+        'primary': {
+            '50': '236 247 240',
+            '100': '209 236 219',
+            '200': '166 218 187',
+            '300': '117 197 152',
+            '400': '61 166 111',
+            '500': '5 130 64',
+            '600': '4 108 53',
+            '700': '4 88 44',
+            '800': '4 61 32',
+            '900': '3 42 22',
+            '950': '2 26 14',
+        },
+    },
+    'SIDEBAR': {
+        'show_search': True,
+        'show_all_applications': False,
+        'navigation': [
+            {
+                'title': 'Заявки',
+                'items': [
+                    {
+                        'title': 'Все заявки',
+                        'icon': 'inbox',
+                        'link': reverse_lazy('admin:landing_lead_changelist'),
+                    },
+                    {
+                        'title': 'Новые',
+                        'icon': 'mark_email_unread',
+                        'link': lambda request: reverse('admin:landing_lead_changelist') + '?status__exact=new',
+                    },
+                    {
+                        'title': 'В работе',
+                        'icon': 'pending_actions',
+                        'link': lambda request: reverse('admin:landing_lead_changelist') + '?status__exact=in_work',
+                    },
+                ],
+            },
+            {
+                'title': 'Доступ',
+                'separator': True,
+                'items': [
+                    {
+                        'title': 'Пользователи',
+                        'icon': 'person',
+                        'link': reverse_lazy('admin:auth_user_changelist'),
+                    },
+                    {
+                        'title': 'Группы',
+                        'icon': 'group',
+                        'link': reverse_lazy('admin:auth_group_changelist'),
+                    },
+                ],
+            },
+        ],
+    },
+    'DASHBOARD_CALLBACK': 'landing.dashboard.dashboard_callback',
+}
 
 
 # --- база данных -----------------------------------------------------------
@@ -139,6 +236,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # --- локализация -----------------------------------------------------------
 
 LANGUAGE_CODE = 'ru'
+LOCALE_PATHS = [BASE_DIR / 'locale']
 TIME_ZONE = 'Asia/Almaty'
 USE_I18N = True
 USE_TZ = True

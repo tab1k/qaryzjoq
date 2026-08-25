@@ -1,0 +1,62 @@
+{% extends "unfold/layouts/base_simple.html" %}
+{% load i18n humanize %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block title %}Панель управления — QARYZ JOQ{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="font-semibold text-xl text-font-important-light dark:text-font-important-dark">Заявки с сайта</h1>
+  <p class="text-font-subtle-light dark:text-font-subtle-dark text-sm mt-1">
+    Всего расчётов на калькуляторе: {{ calc_stats.with_calc }} · общая сумма долгов в заявках:
+    {{ calc_stats.debt_sum|intcomma }} ₸
+  </p>
+</div>
+
+<div class="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 lg:grid-cols-4">
+  {% for card in cards %}
+    <a href="{{ card.link }}"
+       class="block border rounded-default p-6 transition-all shadow-xs bg-white border-base-200 hover:shadow-md dark:bg-base-900 dark:border-base-800">
+      <span class="material-symbols-outlined text-primary-600 dark:text-primary-500">{{ card.icon }}</span>
+      <div class="font-semibold mt-3 text-3xl text-font-important-light dark:text-font-important-dark">{{ card.value }}</div>
+      <div class="text-font-subtle-light dark:text-font-subtle-dark text-sm mt-1">{{ card.title }}</div>
+    </a>
+  {% endfor %}
+</div>
+
+<div class="border rounded-default overflow-hidden bg-white border-base-200 dark:bg-base-900 dark:border-base-800">
+  <div class="border-b px-6 py-4 border-base-200 dark:border-base-800">
+    <h2 class="font-semibold text-font-important-light dark:text-font-important-dark">Последние заявки</h2>
+  </div>
+
+  <table class="w-full text-sm">
+    <thead class="text-font-subtle-light dark:text-font-subtle-dark">
+      <tr>
+        <th class="text-left font-medium px-6 py-3">Дата</th>
+        <th class="text-left font-medium px-6 py-3">Имя</th>
+        <th class="text-left font-medium px-6 py-3">Телефон</th>
+        <th class="text-left font-medium px-6 py-3">Новый платёж</th>
+        <th class="text-left font-medium px-6 py-3">Статус</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for lead in recent_leads %}
+        <tr class="border-t border-base-200 dark:border-base-800">
+          <td class="px-6 py-3 text-font-subtle-light dark:text-font-subtle-dark">{{ lead.created_at|date:"d.m.Y H:i" }}</td>
+          <td class="px-6 py-3">
+            <a href="{% url 'admin:landing_lead_change' lead.pk %}" class="font-medium text-primary-600 dark:text-primary-500">{{ lead.name }}</a>
+          </td>
+          <td class="px-6 py-3">{{ lead.phone }}</td>
+          <td class="px-6 py-3">
+            {% if lead.calc_result %}{{ lead.calc_result|intcomma }} ₸{% else %}—{% endif %}
+          </td>
+          <td class="px-6 py-3">{{ lead.get_status_display }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="px-6 py-6 text-center text-font-subtle-light dark:text-font-subtle-dark">Заявок пока нет</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

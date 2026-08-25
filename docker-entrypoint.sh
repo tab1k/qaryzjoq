@@ -24,13 +24,8 @@ python manage.py migrate --noinput
 echo "→ Сборка статики"
 python manage.py collectstatic --noinput --clear
 
-# суперпользователь создаётся только если задан пароль и его ещё нет
-if [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
-  echo "→ Проверка суперпользователя"
-  python manage.py createsuperuser --noinput 2>/dev/null && \
-    echo "  создан: $DJANGO_SUPERUSER_USERNAME" || \
-    echo "  уже существует, пропускаем"
-fi
+echo "→ Проверка суперпользователя"
+python manage.py ensure_superuser
 
 if [ "$1" = "gunicorn" ]; then
   echo "→ Запуск gunicorn на порту ${GUNICORN_PORT:-8000}"

@@ -22,13 +22,14 @@
           <li><a href="#top" class="is-active">Главная</a></li>
           <li><a href="#how">Как это работает</a></li>
           <li><a href="#terms">Сколько длится работа</a></li>
+          <li><a href="#reviews">Отзывы</a></li>
           <li><a href="#clients">Наши клиенты</a></li>
           <li><a href="#calc">Калькулятор</a></li>
         </ul>
 
         <div class="nav-panel-foot">
           <a href="tel:+77080903480" class="nav-panel-phone">+7 (708) 090 34 80</a>
-          <p>Ежедневно с 9:00 до 20:00</p>
+          <p>Ежедневно с 9:00 до 18:00</p>
           <button type="button" class="btn btn-accent btn-block" data-modal-open>Бесплатная консультация</button>
         </div>
       </div>
@@ -67,6 +68,7 @@
 
     <a href="#how" class="scroll-down">Как это работает?<span aria-hidden="true">↓</span></a>
   </div>
+
 </header>
 
 <!-- КАК ЭТО РАБОТАЕТ -->
@@ -100,7 +102,73 @@
       <p>Сумма долга должна быть больше 4 млн тг</p>
       <p>Должен быть официальный доход</p>
     </div>
-    <a href="#clients" class="scroll-down">Наши клиенты<span aria-hidden="true">↓</span></a>
+    <a href="#reviews" class="scroll-down">Отзывы<span aria-hidden="true">↓</span></a>
+  </div>
+</section>
+
+<!-- ОТЗЫВЫ -->
+<section class="section reviews" id="reviews">
+  <img class="deco deco-shape m-spiral3" src="{% static 'img/Untitled@2-1536x735 1.png' %}" alt="" aria-hidden="true">
+
+  <div class="wrap">
+    <div class="section-head center">
+      <h2 class="h-section">Отзывы</h2>
+      <p>Что пишут клиенты после завершения работы</p>
+    </div>
+
+    <div class="reviews-flow" id="reviewsTrack">
+      <article class="rev rev-ig" style="--rot:-1.6deg">
+        <p>Здравствуйте, это действительно правда, мне очень помогли, спасибо большое. В этой компании работают настоящие специалисты — компетентные, грамотные, вежливые. Обращайтесь, вам помогут как и мне, сопровождают и защищают.</p>
+        <footer>
+          <span class="rev-ava">U</span>
+          <span class="rev-name">umuttanatkanova</span>
+          <time class="rev-time">3 дн.</time>
+          <img class="rev-src" src="{% static 'icon-instagram.svg' %}" alt="Instagram">
+        </footer>
+      </article>
+
+      <article class="rev rev-wa" style="--rot:1.5deg">
+        <p>Да, путь длинный, но есть результат. Спасибо Вам и вашим сотрудникам за помощь. Желаю вам дальнейшего развития и процветания.</p>
+        <footer>
+          <span class="rev-ava">К</span>
+          <span class="rev-name">Клиент компании</span>
+          <time class="rev-time">16:27</time>
+          <img class="rev-src" src="{% static 'icon-whatsapp.svg' %}" alt="WhatsApp">
+        </footer>
+      </article>
+
+      <article class="rev rev-ig" style="--rot:1.1deg">
+        <p>Это компания действительно помогает людям, которые оказались в трудном финансовом положении.</p>
+        <footer>
+          <span class="rev-ava">U</span>
+          <span class="rev-name">umuttanatkanova</span>
+          <time class="rev-time">22 ч.</time>
+          <img class="rev-src" src="{% static 'icon-instagram.svg' %}" alt="Instagram">
+        </footer>
+      </article>
+
+      <article class="rev rev-wa rev-wide" style="--rot:-1.2deg">
+        <p>Здравствуйте, Ерлан. Я хотела бы выразить Вам огромную благодарность за вашу квалифицированную помощь. Вы профессионал своего дела. Очень рада, что попала к Вам на консультацию и осталась. Вы помогли мне избавиться от долгов и начать жизнь с чистого листа. Спасибо Вам огромное.</p>
+        <footer>
+          <span class="rev-ava">З</span>
+          <span class="rev-name">Зумрат</span>
+          <time class="rev-time">16:29</time>
+          <img class="rev-src" src="{% static 'icon-whatsapp.svg' %}" alt="WhatsApp">
+        </footer>
+      </article>
+
+      <article class="rev rev-ig" style="--rot:-2deg">
+        <p>Согласен с выше написанным, мне помогли.</p>
+        <footer>
+          <span class="rev-ava">A</span>
+          <span class="rev-name">andreipetrachencov</span>
+          <time class="rev-time">16 ч.</time>
+          <img class="rev-src" src="{% static 'icon-instagram.svg' %}" alt="Instagram">
+        </footer>
+      </article>
+    </div>
+
+    <div class="dots reviews-dots" id="reviewsDots"></div>
   </div>
 </section>
 
@@ -116,11 +184,23 @@
       <button class="arrow" type="button" data-slide="-1" aria-label="Назад">←</button>
 
       <div class="slider" id="slider">
-        <article class="slide"><span class="slide-badge">Видео</span><p>Отзыв клиента</p></article>
-        <article class="slide"><span class="slide-badge">Фото</span><p>Отзыв клиента</p></article>
-        <article class="slide is-active"><span class="slide-badge">Видео</span><p>Отзыв клиента</p></article>
-        <article class="slide"><span class="slide-badge">Фото</span><p>Отзыв клиента</p></article>
-        <article class="slide"><span class="slide-badge">Видео</span><p>Отзыв клиента</p></article>
+        <article class="slide slide-video">
+          <video src="{% static 'videos/first.mp4' %}" preload="metadata" playsinline controls
+                 poster="" aria-label="Видеоотзыв клиента"></video>
+          <span class="slide-badge">Видео</span>
+        </article>
+
+        <article class="slide slide-video is-active">
+          <video src="{% static 'videos/second.mp4' %}" preload="metadata" playsinline controls
+                 aria-label="Видеоотзыв клиента"></video>
+          <span class="slide-badge">Видео</span>
+        </article>
+
+        <article class="slide media-photo"
+                 style="background-image: url('{% static 'img/team.jpeg' %}')">
+          <span class="slide-badge">Фото</span>
+          <p>Команда QARYZ JOQ</p>
+        </article>
       </div>
 
       <button class="arrow" type="button" data-slide="1" aria-label="Вперёд">→</button>
@@ -251,13 +331,14 @@
           <nav class="footer-nav">
             <a href="#how">Как это работает</a>
             <a href="#terms">Сколько длится работа</a>
+            <a href="#reviews">Отзывы</a>
             <a href="#clients">Наши клиенты</a>
             <a href="#calc">Калькулятор</a>
           </nav>
 
           <div class="footer-contacts">
             <a href="tel:+77080903480" class="footer-phone">+7 (708) 090 34 80</a>
-            <p>Ежедневно с 9:00 до 20:00</p>
+            <p>Ежедневно с 9:00 до 18:00</p>
           </div>
         </div>
       </div>

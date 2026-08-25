@@ -107,15 +107,16 @@
     });
   });
 
-  /* слайдер «Наши клиенты» ------------------------------------------------ */
-  var track = document.getElementById('slider');
+  /* слайдеры: «Наши клиенты» и отзывы на телефоне ------------------------- */
+  var setupSlider = function (track, dotsBox, arrows) {
+    if (!track) return;
 
-  if (track) {
-    var slides = Array.prototype.slice.call(track.querySelectorAll('.slide'));
-    var dotsBox = document.getElementById('sliderDots');
+    var slides = Array.prototype.slice.call(track.children);
+    if (!slides.length) return;
+
     var current = Math.max(0, slides.findIndex(function (s) { return s.classList.contains('is-active'); }));
 
-    var dots = slides.map(function (s, i) {
+    var dots = !dotsBox ? [] : slides.map(function (slide, i) {
       var b = document.createElement('button');
       b.type = 'button';
       b.setAttribute('aria-label', 'Слайд ' + (i + 1));
@@ -147,33 +148,48 @@
     var goTo = function (i) {
       i = Math.max(0, Math.min(slides.length - 1, i));
       mark(i);
-      // ширина активного слайда меняется — центруем после перерисовки
-      window.requestAnimationFrame(function () {
+      window.setTimeout(function () {
         track.scrollTo({ left: centerOf(slides[i]), behavior: 'smooth' });
-      });
+      }, 20);
     };
 
-    document.querySelectorAll('.work .arrow').forEach(function (btn) {
+    (arrows || []).forEach(function (btn) {
       btn.addEventListener('click', function () {
         goTo(current + parseInt(btn.dataset.slide, 10));
       });
     });
 
-    var ticking = false;
+    var timer = null;
     track.addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(function () {
+      if (timer) return;
+      timer = window.setTimeout(function () {
+        timer = null;
         var i = nearest();
         if (i !== current) mark(i);   // подстройка под свайп
-        ticking = false;
-      });
+      }, 60);
     }, { passive: true });
 
+    var center = function () {
+      // на десктопе отзывы стоят колонкой — центрировать нечего
+      if (track.scrollWidth > track.clientWidth + 4) track.scrollLeft = centerOf(slides[current]);
+    };
+
     mark(current);
-    window.requestAnimationFrame(function () { track.scrollLeft = centerOf(slides[current]); });
-    window.addEventListener('resize', function () { track.scrollLeft = centerOf(slides[current]); });
-  }
+    window.setTimeout(center, 30);
+    window.addEventListener('resize', center);
+  };
+
+  setupSlider(
+    document.getElementById('slider'),
+    document.getElementById('sliderDots'),
+    Array.prototype.slice.call(document.querySelectorAll('.work .arrow'))
+  );
+
+  setupSlider(
+    document.getElementById('reviewsTrack'),
+    document.getElementById('reviewsDots'),
+    []
+  );
 
   /* калькулятор списания -------------------------------------------------- */
   var lastCalc = null;

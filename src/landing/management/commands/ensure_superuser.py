@@ -1,0 +1,32 @@
+"""Создаёт суперпользователя, если его ещё нет.
+
+Запускается при старте контейнера: повторный запуск ничего не ломает.
+Данные берутся из DJANGO_SUPERUSER_USERNAME / _EMAIL / _PASSWORD.
+"""
+
+import os
+
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
+
+
+class Command(BaseCommand):
+    help = 'Создаёт суперпользователя из переменных окружения, если такого ещё нет'
+
+    def handle(self, *args, **options):
+        username = os.environ.get('DJANGO_SUPERUSER_USERNAME')
+        password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
+        email = os.environ.get('DJANGO_SUPERUSER_EMAIL', '')
+
+        if not username or not password:
+            self.stdout.write('  DJANGO_SUPERUSER_USERNAME/PASSWORD не заданы — пропускаем')
+            return
+
+        User = get_user_model()
+
+        if User.objects.filter(username=username).exists():
+            self.stdout.write(f'  «{username}» уже существует')
+            return
+
+        User.objects.create_superuser(username=username, email=email, password=password)
+        self.stdout.write(self.style.SUCCESS(f'  создан суперпользователь «{username}»'))
