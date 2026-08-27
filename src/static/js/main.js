@@ -107,14 +107,20 @@
     });
   });
 
-  /* слайдеры: «Наши клиенты» и отзывы на телефоне ------------------------- */
-  var setupSlider = function (track, dotsBox, arrows) {
+  /* слайдер «Наши клиенты» ----------------------------------------------- */
+  var setupClientSlider = function () {
+    var track = document.getElementById('slider');
+    var dotsBox = document.getElementById('sliderDots');
+    var arrows = Array.prototype.slice.call(document.querySelectorAll('.work .arrow'));
+
     if (!track) return;
-
     var slides = Array.prototype.slice.call(track.children);
-    if (!slides.length) return;
+    var count = slides.length;
+    if (!count) return;
 
-    var current = Math.max(0, slides.findIndex(function (s) { return s.classList.contains('is-active'); }));
+    var current = 0;
+    var activeIndex = slides.findIndex(function (s) { return s.classList.contains('is-active'); });
+    if (activeIndex >= 0) current = activeIndex;
 
     var dots = !dotsBox ? [] : slides.map(function (slide, i) {
       var b = document.createElement('button');
@@ -125,71 +131,81 @@
       return b;
     });
 
-    var centerOf = function (slide) {
-      return slide.offsetLeft - (track.clientWidth - slide.offsetWidth) / 2;
-    };
+    var render = function () {
+      slides.forEach(function (slide, i) {
+        slide.classList.remove('is-active', 'is-prev', 'is-next', 'is-hidden');
+        var diff = (i - current + count) % count;
+        if (diff === 0) {
+          slide.classList.add('is-active');
+        } else if (diff === 1) {
+          slide.classList.add('is-next');
+        } else if (diff === count - 1) {
+          slide.classList.add('is-prev');
+        } else {
+          slide.classList.add('is-hidden');
+        }
 
-    var nearest = function () {
-      var mid = track.scrollLeft + track.clientWidth / 2;
-      var best = 0, bestDist = Infinity;
-      slides.forEach(function (s, i) {
-        var d = Math.abs(s.offsetLeft + s.offsetWidth / 2 - mid);
-        if (d < bestDist) { bestDist = d; best = i; }
+        // Если видео не активно — ставим на паузу
+        if (diff !== 0) {
+          var v = slide.querySelector('video');
+          if (v && !v.paused) v.pause();
+        }
       });
-      return best;
-    };
 
-    var mark = function (i) {
-      current = i;
-      slides.forEach(function (s, n) { s.classList.toggle('is-active', n === i); });
-      dots.forEach(function (d, n) { d.classList.toggle('is-active', n === i); });
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle('is-active', i === current);
+      });
     };
 
     var goTo = function (i) {
-      i = Math.max(0, Math.min(slides.length - 1, i));
-      mark(i);
-      window.setTimeout(function () {
-        track.scrollTo({ left: centerOf(slides[i]), behavior: 'smooth' });
-      }, 20);
+      current = (i + count) % count;
+      render();
     };
 
-    (arrows || []).forEach(function (btn) {
+    arrows.forEach(function (btn) {
       btn.addEventListener('click', function () {
-        goTo(current + parseInt(btn.dataset.slide, 10));
+        var dir = parseInt(btn.dataset.slide, 10) || 1;
+        goTo(current + dir);
       });
     });
 
-    var timer = null;
-    track.addEventListener('scroll', function () {
-      if (timer) return;
-      timer = window.setTimeout(function () {
-        timer = null;
-        var i = nearest();
-        if (i !== current) mark(i);   // подстройка под свайп
-      }, 60);
+    slides.forEach(function (slide, i) {
+      slide.addEventListener('click', function (e) {
+        if (!slide.classList.contains('is-active')) {
+          e.preventDefault();
+          goTo(i);
+        }
+      });
+    });
+
+    // Свайпы на мобильных устройствах
+    var touchStartX = 0;
+    var touchStartY = 0;
+    track.addEventListener('touchstart', function (e) {
+      if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
     }, { passive: true });
 
-    var center = function () {
-      // на десктопе отзывы стоят колонкой — центрировать нечего
-      if (track.scrollWidth > track.clientWidth + 4) track.scrollLeft = centerOf(slides[current]);
-    };
+    track.addEventListener('touchend', function (e) {
+      if (e.changedTouches.length === 1) {
+        var dx = e.changedTouches[0].clientX - touchStartX;
+        var dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) {
+            goTo(current + 1);
+          } else {
+            goTo(current - 1);
+          }
+        }
+      }
+    }, { passive: true });
 
-    mark(current);
-    window.setTimeout(center, 30);
-    window.addEventListener('resize', center);
+    render();
   };
 
-  setupSlider(
-    document.getElementById('slider'),
-    document.getElementById('sliderDots'),
-    Array.prototype.slice.call(document.querySelectorAll('.work .arrow'))
-  );
-
-  setupSlider(
-    document.getElementById('reviewsTrack'),
-    document.getElementById('reviewsDots'),
-    []
-  );
+  setupClientSlider();
 
   /* калькулятор списания -------------------------------------------------- */
   var lastCalc = null;
