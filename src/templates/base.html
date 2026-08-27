@@ -3,13 +3,77 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}QARYZ JOQ — законное списание долгов{% endblock %}</title>
-  <meta name="description" content="{% block description %}QARYZ JOQ — банкротство физических лиц и законное списание долгов в Казахстане. Бесплатная консультация юриста.{% endblock %}">
+  <title>{% block title %}QARYZ JOQ — законное списание долгов и снижение платежей по кредитам в Казахстане{% endblock %}</title>
+  <meta name="description" content="{% block description %}Восстановление платёжеспособности в Казахстане: законно снижаем ежемесячный платёж по кредитам в 2–3 раза. Бесплатная консультация юриста. Рассчитайте новый платёж за 1 минуту.{% endblock %}">
+  <meta name="keywords" content="списание долгов казахстан, банкротство физических лиц казахстан, восстановление платежеспособности казахстан, уменьшение платежа по кредитам, юрист по кредитам алматы, юрист по кредитам астана, qaryz joq, карыз жок, реструктуризация кредитов, кредитные каникулы казахстан, помощь с кредитами">
+  <meta name="author" content="QARYZ JOQ">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="theme-color" content="#058240">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- Open Graph / Facebook / WhatsApp / Telegram -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_KZ">
+  <meta property="og:site_name" content="QARYZ JOQ">
+  <meta property="og:title" content="{% block og_title %}QARYZ JOQ — Платите в 2-3 раза меньше за свои кредиты{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Снижаем ежемесячный платёж по кредитам через официальную процедуру восстановления платёжеспособности в Казахстане.{% endblock %}">
+  <meta property="og:url" content="https://go.qaryzjoq.kz/">
+  <meta property="og:image" content="https://go.qaryzjoq.kz{% static 'brand/logo-full.png' %}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="QARYZ JOQ — нет долгов">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="QARYZ JOQ — Законное снижение платежей по кредитам">
+  <meta name="twitter:description" content="Восстановление платёжеспособности: снижаем платёж по кредитам в 2–3 раза. Бесплатная консультация.">
+  <meta name="twitter:image" content="https://go.qaryzjoq.kz{% static 'brand/logo-full.png' %}">
+
+  <link rel="canonical" href="https://go.qaryzjoq.kz/">
   <link rel="icon" href="{% static 'brand/logo-mark.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'brand/logo-mark.png' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  <!-- Schema.org Microdata (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FinancialService",
+    "name": "QARYZ JOQ",
+    "alternateName": "Карыз Жок",
+    "description": "Юридическая помощь в процедуре восстановления платёжеспособности и законном снижении платежей по кредитам в Казахстане.",
+    "url": "https://go.qaryzjoq.kz/",
+    "logo": "https://go.qaryzjoq.kz{% static 'brand/logo-full.png' %}",
+    "image": "https://go.qaryzjoq.kz{% static 'brand/logo-full.png' %}",
+    "telephone": "+77080903480",
+    "priceRange": "₸₸",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "KZ"
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "09:00",
+      "closes": "18:00"
+    },
+    "sameAs": [
+      "https://www.instagram.com/qaryzjoq.kz",
+      "https://wa.me/77080903480"
+    ]
+  }
+  </script>
 
   <!-- Meta Pixel Code -->
   <script>
