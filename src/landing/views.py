@@ -3,7 +3,6 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from .bitrix24 import send_lead_to_bitrix24
 from .forms import LeadForm
 
 
@@ -18,8 +17,7 @@ def index(request):
         submitted = LeadForm(request.POST)
 
         if submitted.is_valid():
-            lead = submitted.save()
-            send_lead_to_bitrix24(lead)
+            submitted.save()
 
             if _is_ajax(request):
                 return JsonResponse({'ok': True, 'redirect_url': reverse('landing:thanks')})
