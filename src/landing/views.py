@@ -20,10 +20,9 @@ def index(request):
             submitted.save()
 
             if _is_ajax(request):
-                return JsonResponse({'ok': True})
+                return JsonResponse({'ok': True, 'redirect_url': reverse('landing:thanks')})
 
-            messages.success(request, 'Спасибо! В рабочее время с вами свяжется наш специалист.')
-            return redirect(reverse('landing:index'))
+            return redirect(reverse('landing:thanks'))
 
         if _is_ajax(request):
             return JsonResponse({'ok': False, 'errors': submitted.errors}, status=400)
@@ -34,6 +33,10 @@ def index(request):
         'form': form,
         'modal_form': LeadForm(auto_id='m_%s'),
     })
+
+
+def thanks(request):
+    return render(request, 'landing/thanks.html')
 
 
 def robots_txt(request):

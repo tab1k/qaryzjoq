@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Спасибо за заявку — QARYZ JOQ{% endblock %}
+{% block description %}Ваша заявка успешно принята. Наш специалист свяжется с вами в ближайшее время.{% endblock %}
+
+{% block content %}
+<!-- Шапка -->
+<div class="nav-shell is-stuck">
+  <div class="wrap">
+    <nav class="nav" style="grid-template-columns: auto 1fr; justify-content: space-between;">
+      <a href="{% url 'landing:index' %}" class="nav-logo">
+        <img src="{% static 'brand/logo-lockup.png' %}" alt="QARYZ JOQ">
+      </a>
+      <div class="nav-side" style="margin-left: auto;">
+        <a href="tel:+77080903480" class="btn btn-dark btn-sm">+7 (708) 090 34 80</a>
+      </div>
+    </nav>
+  </div>
+</div>
+
+<!-- Страница Спасибо -->
+<main class="thanks-shell">
+  <img class="blob blob-main" src="{% static 'img/Mask group.png' %}" alt="" aria-hidden="true">
+  <img class="deco deco-shape m-zigzag" src="{% static 'img/Untitled@2-1536x735 (1) 1.png' %}" alt="" aria-hidden="true">
+  <img class="deco deco-shape m-asterisk" src="{% static 'img/Untitled@2-1536x735 (2) 1.png' %}" alt="" aria-hidden="true">
+
+  <div class="thanks-card">
+    <div class="thanks-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+
+    <h1>Спасибо! Ваша заявка принята</h1>
+    <p>Мы уже получили вашу информацию. В рабочее время (с 9:00 до 18:00) с вами свяжется наш специалист и проведёт бесплатную консультацию по вашей ситуации.</p>
+
+    <div class="thanks-actions">
+      <a href="https://wa.me/77080903480" target="_blank" rel="noopener" class="btn btn-accent">
+        <img src="{% static 'icon-whatsapp.svg' %}" alt="" style="width: 20px; height: 20px; filter: brightness(0) invert(1);">
+        Написать в WhatsApp
+      </a>
+      <a href="{% url 'landing:index' %}" class="btn btn-dark">
+        Вернуться на главную
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- Подвал -->
+<footer class="footer" style="padding: 24px 0 36px;">
+  <div class="wrap">
+    <div class="footer-bottom" style="margin-top: 0; padding-top: 0; border: none; justify-content: center;">
+      <p style="text-align: center;">© {% now "Y" %} QARYZ JOQ. Все права защищены.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Meta Pixel Lead Event -->
+<script>
+  if (typeof fbq === 'function') {
+    fbq('track', 'Lead');
+  }
+</script>
+{% endblock %}

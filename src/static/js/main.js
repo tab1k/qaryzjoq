@@ -393,6 +393,13 @@
           submit.textContent = 'Отправить';
 
           if (res.ok && res.data.ok) {
+            if (typeof fbq === 'function') {
+              try { fbq('track', 'Lead'); } catch(e) {}
+            }
+            if (res.data.redirect_url) {
+              window.location.href = res.data.redirect_url;
+              return;
+            }
             body.hidden = true;
             done.hidden = false;
             card.scrollTop = 0;

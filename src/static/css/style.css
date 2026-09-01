@@ -1006,3 +1006,50 @@ body.is-locked { overflow: hidden; }
   .slide.is-prev { transform: translate(calc(-50% - 95px), -50%) scale(.76); opacity: .35; }
   .slide.is-next { transform: translate(calc(-50% + 95px), -50%) scale(.76); opacity: .35; }
 }
+
+/* --- страница спасибо (thank you page) -------------------------------- */
+.thanks-shell {
+  min-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 100px 24px 60px;
+  position: relative;
+}
+.thanks-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 620px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 54px 44px;
+  box-shadow: 0 24px 60px -28px rgba(13, 19, 15, .3);
+}
+.thanks-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: 0 10px 24px -8px rgba(5, 130, 64, .4);
+}
+.thanks-icon svg { width: 38px; height: 38px; }
+.thanks-card h1 { font-size: clamp(30px, 4.4vw, 42px); margin-bottom: 16px; color: var(--ink); }
+.thanks-card p { font-size: 16px; line-height: 1.65; color: #38443d; max-width: 48ch; margin: 0 auto 32px; }
+.thanks-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.thanks-actions .btn { min-width: 210px; }
+
+@media (max-width: 640px) {
+  .thanks-shell { padding: 80px 18px 40px; }
+  .thanks-card { padding: 36px 22px; }
+  .thanks-actions { flex-direction: column; }
+  .thanks-actions .btn { width: 100%; }
+}
+
