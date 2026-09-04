@@ -12,7 +12,7 @@ class LeadForm(forms.ModelForm):
         fields = ('name', 'phone', 'debt', 'message') + CALC_FIELDS
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Как к вам обращаться'}),
-            'phone': forms.TextInput(attrs={'placeholder': '+7 (___) ___-__-__'}),
+            'phone': forms.TextInput(attrs={'type': 'tel', 'inputmode': 'tel', 'autocomplete': 'tel', 'placeholder': '+7 (700) 000-00-00'}),
             'debt': forms.TextInput(attrs={'placeholder': 'Например, 4 500 000 ₸'}),
             'message': forms.Textarea(attrs={'placeholder': 'Коротко опишите ситуацию', 'rows': 4}),
             **{name: forms.HiddenInput() for name in CALC_FIELDS},

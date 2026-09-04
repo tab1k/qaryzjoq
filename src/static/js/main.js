@@ -420,4 +420,63 @@
         });
     });
   }
+
+  /* маска ввода номера телефона (+7 (7XX) XXX-XX-XX) -------------------- */
+  function initPhoneMask(input) {
+    if (!input) return;
+
+    input.setAttribute('type', 'tel');
+    input.setAttribute('inputmode', 'tel');
+    input.setAttribute('autocomplete', 'tel');
+
+    function format(val) {
+      var digits = val.replace(/\D/g, '');
+      if (!digits) return '';
+
+      // Если ввели 7 или 8 в начале, отсекаем первую цифру, т.к. +7 зашит в шаблон
+      if (digits[0] === '7' || digits[0] === '8') {
+        digits = digits.substring(1);
+      }
+      digits = digits.substring(0, 10);
+
+      var res = '+7 (';
+      if (digits.length > 0) {
+        res += digits.substring(0, 3);
+      }
+      if (digits.length >= 3) {
+        res += ') ' + digits.substring(3, 6);
+      }
+      if (digits.length >= 6) {
+        res += '-' + digits.substring(6, 8);
+      }
+      if (digits.length >= 8) {
+        res += '-' + digits.substring(8, 10);
+      }
+      return res;
+    }
+
+    input.addEventListener('input', function () {
+      input.value = format(input.value);
+    });
+
+    input.addEventListener('focus', function () {
+      if (!input.value) {
+        input.value = '+7 (';
+      }
+    });
+
+    input.addEventListener('blur', function () {
+      if (input.value === '+7 (' || input.value === '+7' || input.value === '+') {
+        input.value = '';
+      }
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && input.value.length <= 4) {
+        input.value = '';
+      }
+    });
+  }
+
+  document.querySelectorAll('input[name="phone"], input[type="tel"], #id_phone, #m_phone').forEach(initPhoneMask);
 })();

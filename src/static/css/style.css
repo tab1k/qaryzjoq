@@ -251,18 +251,19 @@ p { margin: 0; line-height: 1.7; color: var(--body); font-size: 14.3px; }
 .hero-socials a:hover { transform: translateY(-2px); }
 .hero-socials img { width: 20px; height: 20px; }
 
-/* блок «ВАЖНО» под кнопкой */
-.note { margin-top: 22px; font-size: 15.4px; line-height: 1.75; }
-.note b {
+/* блок «ВАЖНО! Условия:» под кнопкой */
+.note { margin-top: 22px; font-size: 16.5px; line-height: 1.75; }
+.note b,
+.note-title {
   display: block;
-  margin-bottom: 6px;
-  font-size: 15.4px;
-  font-weight: 800;
-  letter-spacing: .04em;
+  margin-bottom: 8px;
+  font-size: 18.5px;
+  font-weight: 900;
+  letter-spacing: .02em;
   color: var(--red);
 }
-.note p { font-size: 15.4px; font-weight: 600; color: #38443d; }
-.note-left { margin-top: 18px; max-width: 40ch; }
+.note p { font-size: 16px; font-weight: 700; color: #212924; }
+.note-left { margin-top: 18px; max-width: 44ch; }
 
 .scroll-down {
   display: inline-flex;
