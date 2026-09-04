@@ -25,8 +25,8 @@ def _format_money(amount: int | float | None) -> str:
 def send_lead_to_bitrix24(lead) -> bool:
     """Отправляет созданную заявку (Lead) в Битрикс24 CRM.
 
-    Создаёт лид со всеми параметрами расчёта из калькулятора,
-    контактами и структурированным описанием.
+    Создаёт лид с источником «Лендинг» (ID=3 в Б24), параметрами
+    расчёта из калькулятора, контактами и детальным описанием.
     """
     webhook_url = getattr(settings, 'BITRIX24_WEBHOOK_URL', '').strip()
     if not webhook_url:
@@ -52,10 +52,12 @@ def send_lead_to_bitrix24(lead) -> bool:
 
     comments = "<br>\n".join(details) if details else "Заявка на бесплатную консультацию с сайта"
 
-    # Заголовок лида для удобного просмотра менеджером в CRM
+    # Заголовок лида для менеджеров в CRM
     title = f"Заявка с сайта: {lead.name}"
     if lead.calc_result:
         title += f" (новый платёж {_format_money(lead.calc_result)})"
+
+    source_id = getattr(settings, 'BITRIX24_SOURCE_ID', '3')
 
     payload = {
         "fields": {
@@ -63,8 +65,12 @@ def send_lead_to_bitrix24(lead) -> bool:
             "NAME": lead.name,
             "PHONE": [{"VALUE": str(lead.phone), "VALUE_TYPE": "WORK"}],
             "COMMENTS": comments,
-            "SOURCE_ID": "WEB",
+            "SOURCE_ID": source_id,  # 3 = «Лендинг» в Битрикс24
+            "SOURCE_DESCRIPTION": "go.qaryzjoq.kz (Калькулятор)",
             "STATUS_ID": "NEW",
+            "UTM_SOURCE": "landing",
+            "UTM_MEDIUM": "website",
+            "UTM_CAMPAIGN": "qaryzjoq",
         },
         "params": {"REGISTER_SONET_EVENT": "Y"}
     }
@@ -98,7 +104,7 @@ def send_lead_to_bitrix24(lead) -> bool:
                 raise
 
         if 'result' in res:
-            logger.info("Лид #%s успешно передан в Битрикс24: B24_ID=%s", lead.id, res.get('result'))
+            logger.info("Лид #%s успешно передан в Битрикс24 с источником «Лендинг»: B24_ID=%s", lead.id, res.get('result'))
             return True
         else:
             logger.warning("Битрикс24 вернул ошибку для лида #%s: %s", lead.id, res)
@@ -106,4 +112,3 @@ def send_lead_to_bitrix24(lead) -> bool:
         logger.error("Ошибка при отправке лида #%s в Битрикс24: %s", getattr(lead, 'id', None), exc)
 
     return False
-
