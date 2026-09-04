@@ -112,3 +112,4 @@ def send_lead_to_bitrix24(lead) -> bool:
         logger.error("Ошибка при отправке лида #%s в Битрикс24: %s", getattr(lead, 'id', None), exc)
 
     return False
+
