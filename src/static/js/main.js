@@ -429,19 +429,23 @@
     input.setAttribute('inputmode', 'tel');
     input.setAttribute('autocomplete', 'tel');
 
-    function format(val) {
-      var digits = val.replace(/\D/g, '');
-      if (!digits) return '';
+    function getDigits(str) {
+      return (str || '').replace(/\D/g, '');
+    }
 
-      // Если ввели 7 или 8 в начале, отсекаем первую цифру, т.к. +7 зашит в шаблон
-      if (digits[0] === '7' || digits[0] === '8') {
+    function formatFromDigits(rawDigits) {
+      if (!rawDigits) return '';
+
+      var digits = rawDigits;
+      // Если начинается с 7 или 8 и длина больше 1, отсекаем префикс страны
+      if (digits.length > 0 && (digits[0] === '7' || digits[0] === '8')) {
         digits = digits.substring(1);
       }
       digits = digits.substring(0, 10);
 
-      var res = '+7 (';
+      var res = '+7';
       if (digits.length > 0) {
-        res += digits.substring(0, 3);
+        res += ' (' + digits.substring(0, 3);
       }
       if (digits.length >= 3) {
         res += ') ' + digits.substring(3, 6);
@@ -455,8 +459,68 @@
       return res;
     }
 
+    // Корректная обработка Backspace для удаления символов и скобок
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace') {
+        var start = input.selectionStart;
+        var end = input.selectionEnd;
+
+        // Если выделен диапазон текста
+        if (start !== end) {
+          return;
+        }
+
+        if (start > 0) {
+          var val = input.value;
+          var prevChar = val.charAt(start - 1);
+
+          // Если символ перед курсором — разделитель (дефис, скобка, пробел)
+          if (/\D/.test(prevChar)) {
+            e.preventDefault();
+            // Ищем последнюю цифру перед курсором
+            var lastDigitIndex = -1;
+            for (var i = start - 1; i >= 0; i--) {
+              if (/\d/.test(val.charAt(i))) {
+                lastDigitIndex = i;
+                break;
+              }
+            }
+
+            if (lastDigitIndex > 1) { // не удаляем +7
+              var newVal = val.slice(0, lastDigitIndex) + val.slice(lastDigitIndex + 1);
+              var d = getDigits(newVal);
+              input.value = d.length > 1 ? formatFromDigits(d) : '';
+              var newCursor = Math.max(0, lastDigitIndex);
+              input.setSelectionRange(newCursor, newCursor);
+            } else {
+              input.value = '';
+            }
+          }
+        }
+      }
+    });
+
     input.addEventListener('input', function () {
-      input.value = format(input.value);
+      var digits = getDigits(input.value);
+      if (!digits || digits.length === 0) {
+        input.value = '';
+        return;
+      }
+
+      // Если ввели только 7 или 8
+      if (digits === '7' || digits === '8') {
+        input.value = '+7 (';
+        return;
+      }
+
+      input.value = formatFromDigits(digits);
+    });
+
+    input.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var pasted = (e.clipboardData || window.clipboardData).getData('text');
+      var digits = getDigits(pasted);
+      input.value = formatFromDigits(digits);
     });
 
     input.addEventListener('focus', function () {
@@ -466,13 +530,8 @@
     });
 
     input.addEventListener('blur', function () {
-      if (input.value === '+7 (' || input.value === '+7' || input.value === '+') {
-        input.value = '';
-      }
-    });
-
-    input.addEventListener('keydown', function (e) {
-      if (e.key === 'Backspace' && input.value.length <= 4) {
+      var digits = getDigits(input.value);
+      if (digits.length <= 1) {
         input.value = '';
       }
     });
