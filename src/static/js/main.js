@@ -396,6 +396,9 @@
             if (typeof fbq === 'function') {
               try { fbq('track', 'Lead'); } catch(e) {}
             }
+            if (typeof ttq === 'object' && typeof ttq.track === 'function') {
+              try { ttq.track('SubmitForm'); } catch(e) {}
+            }
             if (res.data.redirect_url) {
               window.location.href = res.data.redirect_url;
               return;

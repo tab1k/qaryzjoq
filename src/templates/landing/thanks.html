@@ -56,10 +56,14 @@
   </div>
 </footer>
 
-<!-- Meta Pixel Lead Event -->
+<!-- Meta Pixel & TikTok Pixel Conversion Events -->
 <script>
   if (typeof fbq === 'function') {
     fbq('track', 'Lead');
+  }
+  if (typeof ttq === 'object' && typeof ttq.track === 'function') {
+    ttq.track('SubmitForm');
+    ttq.track('CompleteRegistration');
   }
 </script>
 {% endblock %}
