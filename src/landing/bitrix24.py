@@ -83,9 +83,13 @@ def extract_and_save_promo(entity_id: int | str, entity_type: str = 'lead', text
     entity_type = entity_type.lower()
     is_deal = (entity_type == 'deal')
 
-    # Поле промокода для сделок и лидов
     configured_field = getattr(settings, 'BITRIX24_PROMO_FIELD', 'UF_CRM_6A796DFB578FE')
-    candidate_fields = [configured_field, 'UF_CRM_PROMOCODE', 'UF_CRM_6A796DFB578FE']
+    candidate_fields = [
+        'UF_CRM_1786105060756',
+        'UF_CRM_6A796DFB578FE',
+        'UF_CRM_PROMOCODE',
+        configured_field
+    ]
 
     get_method = 'crm.deal.get' if is_deal else 'crm.lead.get'
     update_method = 'crm.deal.update' if is_deal else 'crm.lead.update'
@@ -97,11 +101,6 @@ def extract_and_save_promo(entity_id: int | str, entity_type: str = 'lead', text
         return {"ok": False, "error": f"Failed to fetch {entity_type} #{entity_id}"}
 
     data = res['result']
-
-    # Определяем, в какое именно поле писать
-    target_field = 'UF_CRM_6A796DFB578FE' if (is_deal and 'UF_CRM_6A796DFB578FE' in data) else 'UF_CRM_PROMOCODE'
-    if target_field not in data and configured_field in data:
-        target_field = configured_field
 
     # 2. Если промокод уже заполнен в любом из полей — не перезаписываем
     for field in candidate_fields:
@@ -142,25 +141,31 @@ def extract_and_save_promo(entity_id: int | str, entity_type: str = 'lead', text
                 if promo_code:
                     break
 
-    # 4. Если промокод найден — записываем в кастомное поле
+    # 4. Если промокод найден — записываем во все доступные поля промокода
     if promo_code:
+        fields_to_update = {}
+        for f in candidate_fields:
+            if f in data:
+                fields_to_update[f] = promo_code
+
+        if not fields_to_update:
+            fields_to_update['UF_CRM_1786105060756'] = promo_code
+
         update_res = _b24_call(update_method, {
             'id': entity_id,
-            'fields': {
-                target_field: promo_code
-            },
+            'fields': fields_to_update,
             'params': {'REGISTER_SONET_EVENT': 'N'}
         })
 
         if update_res and update_res.get('result'):
-            logger.info("Успешно сохранён промокод '%s' в поле %s для %s #%s", promo_code, target_field, entity_type, entity_id)
+            logger.info("Успешно сохранён промокод '%s' (поля: %s) для %s #%s", promo_code, list(fields_to_update.keys()), entity_type, entity_id)
             return {
                 "ok": True,
                 "status": "updated",
                 "entity_id": entity_id,
                 "entity_type": entity_type,
                 "promo_code": promo_code,
-                "field": target_field
+                "fields": list(fields_to_update.keys())
             }
         else:
             logger.error("Ошибка при записи промокода в %s #%s: %s", entity_type, entity_id, update_res)
