@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .bitrix24 import extract_and_save_promo_for_deal, send_lead_to_bitrix24
+from .bitrix24 import extract_and_save_promo, send_lead_to_bitrix24
 from .forms import LeadForm
 
 
@@ -47,8 +47,8 @@ def thanks(request):
 def extract_promo_webhook(request):
     """Вебхук для робота Битрикс24 / Wazzup.
 
-    Принимает deal_id (ID сделки) и опциональный текст сообщения.
-    Извлекает 4-8 значный промокод и сохраняет в поле сделки.
+    Принимает id (ID лида или сделки) и опциональный текст сообщения.
+    Извлекает 4-8 значный промокод и сохраняет в поле карточки.
     """
     params = {}
     if request.method == 'POST':
@@ -62,9 +62,10 @@ def extract_promo_webhook(request):
     else:
         params = request.GET.dict()
 
-    # Поддерживаем различные форматы передачи ID сделки из роботов Б24
-    deal_id = (
-        params.get('deal_id')
+    raw_id = (
+        params.get('lead_id')
+        or params.get('LEAD_ID')
+        or params.get('deal_id')
         or params.get('DEAL_ID')
         or params.get('id')
         or params.get('ID')
@@ -72,12 +73,27 @@ def extract_promo_webhook(request):
         or params.get('DOCUMENT_ID')
     )
 
-    # Если передан массив вида ['DEAL', '123']
-    if isinstance(deal_id, (list, tuple)):
-        deal_id = deal_id[-1]
-    elif isinstance(deal_id, str) and '_' in deal_id:
-        # Например DEAL_123 -> 123
-        deal_id = deal_id.split('_')[-1]
+    entity_type = 'lead'
+    if 'deal_id' in params or 'DEAL_ID' in params:
+        entity_type = 'deal'
+    elif 'lead_id' in params or 'LEAD_ID' in params:
+        entity_type = 'lead'
+
+    entity_id = raw_id
+    if isinstance(raw_id, (list, tuple)):
+        raw_id_str = str(raw_id[-1])
+        if 'DEAL' in str(raw_id[0]):
+            entity_type = 'deal'
+        elif 'LEAD' in str(raw_id[0]):
+            entity_type = 'lead'
+        entity_id = raw_id_str
+    elif isinstance(raw_id, str):
+        if raw_id.startswith('DEAL_'):
+            entity_type = 'deal'
+            entity_id = raw_id.replace('DEAL_', '')
+        elif raw_id.startswith('LEAD_'):
+            entity_type = 'lead'
+            entity_id = raw_id.replace('LEAD_', '')
 
     text = (
         params.get('text')
@@ -87,13 +103,13 @@ def extract_promo_webhook(request):
         or params.get('message')
     )
 
-    if not deal_id:
+    if not entity_id:
         return JsonResponse({
             'ok': False,
-            'error': 'Missing deal_id parameter (e.g. ?deal_id={{ID}})'
+            'error': 'Missing id parameter (e.g. ?id={{ID}})'
         }, status=400)
 
-    result = extract_and_save_promo_for_deal(deal_id=deal_id, text=text)
+    result = extract_and_save_promo(entity_id=entity_id, entity_type=entity_type, text=text)
     return JsonResponse(result)
 
 

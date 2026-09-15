@@ -72,51 +72,58 @@ def extract_promo_from_text(text: str | None) -> str | None:
     return None
 
 
-def extract_and_save_promo_for_deal(deal_id: int | str, text: str | None = None) -> dict:
-    """Извлекает промокод из первого сообщения и сохраняет в поле сделки.
+def extract_and_save_promo(entity_id: int | str, entity_type: str = 'lead', text: str | None = None) -> dict:
+    """Извлекает промокод из первого сообщения и сохраняет в поле лида или сделки.
 
-    Если промокод в сделке уже заполнен — повторно не перезаписывает.
+    Если промокод уже заполнен — повторно не перезаписывает.
     """
-    if not deal_id:
-        return {"ok": False, "error": "deal_id is required"}
+    if not entity_id:
+        return {"ok": False, "error": "entity_id is required"}
 
     promo_field = getattr(settings, 'BITRIX24_PROMO_FIELD', 'UF_CRM_6A796DFB578FE')
+    entity_type = entity_type.lower()
+    is_deal = (entity_type == 'deal')
 
-    # 1. Получаем сделку из Битрикс24
-    deal_res = _b24_call('crm.deal.get', {'id': deal_id})
-    if not deal_res or 'result' not in deal_res:
-        return {"ok": False, "error": f"Failed to fetch deal #{deal_id}"}
+    get_method = 'crm.deal.get' if is_deal else 'crm.lead.get'
+    update_method = 'crm.deal.update' if is_deal else 'crm.lead.update'
+    owner_type_id = 2 if is_deal else 1
 
-    deal_data = deal_res['result']
-    existing_promo = deal_data.get(promo_field)
+    # 1. Получаем сущность (лид или сделку) из Битрикс24
+    res = _b24_call(get_method, {'id': entity_id})
+    if not res or 'result' not in res:
+        return {"ok": False, "error": f"Failed to fetch {entity_type} #{entity_id}"}
 
-    # 2. Если промокод уже заполнен — не перезаписываем его
+    data = res['result']
+    existing_promo = data.get(promo_field)
+
+    # 2. Если промокод уже заполнен — не перезаписываем
     if existing_promo:
-        logger.info("В сделке #%s уже заполнен промокод: %s. Пропуск.", deal_id, existing_promo)
+        logger.info("В %s #%s уже заполнен промокод: %s. Пропуск.", entity_type, entity_id, existing_promo)
         return {
             "ok": True,
             "status": "already_set",
-            "deal_id": deal_id,
+            "entity_id": entity_id,
+            "entity_type": entity_type,
             "promo_code": existing_promo
         }
 
     # 3. Ищем текст для извлечения промокода
     promo_code = None
 
-    # А. Если текст передан прямо в запросе (из робота Б24)
+    # А. Из параметров вебхука
     if text:
         promo_code = extract_promo_from_text(text)
 
-    # Б. Если в переданном тексте нет — смотрим комментарий / описание сделки
+    # Б. Из комментариев / описания
     if not promo_code:
-        deal_comments = deal_data.get('COMMENTS') or deal_data.get('ADDITIONAL_INFO')
-        if deal_comments:
-            promo_code = extract_promo_from_text(deal_comments)
+        comments = data.get('COMMENTS') or data.get('ADDITIONAL_INFO')
+        if comments:
+            promo_code = extract_promo_from_text(comments)
 
-    # В. Если всё ещё нет — запрашиваем дела/сообщения таймлайна сделки
+    # В. Из таймлайна (активностей Wazzup / сообщений)
     if not promo_code:
         activities = _b24_call('crm.activity.list', {
-            'filter': {'OWNER_TYPE_ID': 2, 'OWNER_ID': deal_id},
+            'filter': {'OWNER_TYPE_ID': owner_type_id, 'OWNER_ID': entity_id},
             'order': {'ID': 'ASC'}
         })
         if activities and 'result' in activities:
@@ -126,10 +133,10 @@ def extract_and_save_promo_for_deal(deal_id: int | str, text: str | None = None)
                 if promo_code:
                     break
 
-    # 4. Если промокод найден — записываем его в кастомное поле сделки
+    # 4. Если промокод найден — записываем в кастомное поле
     if promo_code:
-        update_res = _b24_call('crm.deal.update', {
-            'id': deal_id,
+        update_res = _b24_call(update_method, {
+            'id': entity_id,
             'fields': {
                 promo_field: promo_code
             },
@@ -137,23 +144,29 @@ def extract_and_save_promo_for_deal(deal_id: int | str, text: str | None = None)
         })
 
         if update_res and update_res.get('result'):
-            logger.info("Успешно сохранён промокод '%s' для сделки #%s", promo_code, deal_id)
+            logger.info("Успешно сохранён промокод '%s' для %s #%s", promo_code, entity_type, entity_id)
             return {
                 "ok": True,
                 "status": "updated",
-                "deal_id": deal_id,
+                "entity_id": entity_id,
+                "entity_type": entity_type,
                 "promo_code": promo_code
             }
         else:
-            logger.error("Ошибка при записи промокода в сделку #%s: %s", deal_id, update_res)
-            return {"ok": False, "error": f"Failed to update deal #{deal_id}"}
+            logger.error("Ошибка при записи промокода в %s #%s: %s", entity_type, entity_id, update_res)
+            return {"ok": False, "error": f"Failed to update {entity_type} #{entity_id}"}
 
-    logger.info("В сделке #%s промокод из 4-8 цифр не обнаружен.", deal_id)
+    logger.info("В %s #%s промокод из 4-8 цифр не обнаружен.", entity_type, entity_id)
     return {
         "ok": True,
         "status": "no_promo_found",
-        "deal_id": deal_id
+        "entity_id": entity_id,
+        "entity_type": entity_type
     }
+
+
+def extract_and_save_promo_for_deal(deal_id: int | str, text: str | None = None) -> dict:
+    return extract_and_save_promo(entity_id=deal_id, entity_type='deal', text=text)
 
 
 def send_lead_to_bitrix24(lead) -> bool:
