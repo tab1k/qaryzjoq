@@ -74,6 +74,7 @@ for _o in ('https://go.qaryzjoq.kz', 'http://go.qaryzjoq.kz', 'https://qaryzjoq.
 
 # --- интеграция Bitrix24 (CRM) ---------------------------------------------
 BITRIX24_WEBHOOK_URL = env('BITRIX24_WEBHOOK_URL', 'https://qaryzjoq.bitrix24.kz/rest/1/y9rcz9ysnx1ukyh7/')
+BITRIX24_PROMO_FIELD = env('BITRIX24_PROMO_FIELD', 'UF_CRM_6A796DFB578FE')
 
 
 # --- приложения ------------------------------------------------------------
