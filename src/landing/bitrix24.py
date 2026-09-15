@@ -80,9 +80,12 @@ def extract_and_save_promo(entity_id: int | str, entity_type: str = 'lead', text
     if not entity_id:
         return {"ok": False, "error": "entity_id is required"}
 
-    promo_field = getattr(settings, 'BITRIX24_PROMO_FIELD', 'UF_CRM_6A796DFB578FE')
     entity_type = entity_type.lower()
     is_deal = (entity_type == 'deal')
+
+    # Поле промокода для сделок и лидов
+    configured_field = getattr(settings, 'BITRIX24_PROMO_FIELD', 'UF_CRM_6A796DFB578FE')
+    candidate_fields = [configured_field, 'UF_CRM_PROMOCODE', 'UF_CRM_6A796DFB578FE']
 
     get_method = 'crm.deal.get' if is_deal else 'crm.lead.get'
     update_method = 'crm.deal.update' if is_deal else 'crm.lead.update'
@@ -94,18 +97,24 @@ def extract_and_save_promo(entity_id: int | str, entity_type: str = 'lead', text
         return {"ok": False, "error": f"Failed to fetch {entity_type} #{entity_id}"}
 
     data = res['result']
-    existing_promo = data.get(promo_field)
 
-    # 2. Если промокод уже заполнен — не перезаписываем
-    if existing_promo:
-        logger.info("В %s #%s уже заполнен промокод: %s. Пропуск.", entity_type, entity_id, existing_promo)
-        return {
-            "ok": True,
-            "status": "already_set",
-            "entity_id": entity_id,
-            "entity_type": entity_type,
-            "promo_code": existing_promo
-        }
+    # Определяем, в какое именно поле писать
+    target_field = 'UF_CRM_6A796DFB578FE' if (is_deal and 'UF_CRM_6A796DFB578FE' in data) else 'UF_CRM_PROMOCODE'
+    if target_field not in data and configured_field in data:
+        target_field = configured_field
+
+    # 2. Если промокод уже заполнен в любом из полей — не перезаписываем
+    for field in candidate_fields:
+        val = data.get(field)
+        if val:
+            logger.info("В %s #%s уже заполнен промокод (%s=%s). Пропуск.", entity_type, entity_id, field, val)
+            return {
+                "ok": True,
+                "status": "already_set",
+                "entity_id": entity_id,
+                "entity_type": entity_type,
+                "promo_code": val
+            }
 
     # 3. Ищем текст для извлечения промокода
     promo_code = None
@@ -138,19 +147,20 @@ def extract_and_save_promo(entity_id: int | str, entity_type: str = 'lead', text
         update_res = _b24_call(update_method, {
             'id': entity_id,
             'fields': {
-                promo_field: promo_code
+                target_field: promo_code
             },
             'params': {'REGISTER_SONET_EVENT': 'N'}
         })
 
         if update_res and update_res.get('result'):
-            logger.info("Успешно сохранён промокод '%s' для %s #%s", promo_code, entity_type, entity_id)
+            logger.info("Успешно сохранён промокод '%s' в поле %s для %s #%s", promo_code, target_field, entity_type, entity_id)
             return {
                 "ok": True,
                 "status": "updated",
                 "entity_id": entity_id,
                 "entity_type": entity_type,
-                "promo_code": promo_code
+                "promo_code": promo_code,
+                "field": target_field
             }
         else:
             logger.error("Ошибка при записи промокода в %s #%s: %s", entity_type, entity_id, update_res)
