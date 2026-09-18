@@ -128,7 +128,20 @@ def extract_and_save_promo(entity_id: int | str, entity_type: str = 'lead', text
         if comments:
             promo_code = extract_promo_from_text(comments)
 
-    # В. Из таймлайна (активностей Wazzup / сообщений)
+    # В. Из таймлайна Wazzup (crm.timeline.comment — именно туда Wazzup пишет сообщения)
+    if not promo_code:
+        timeline = _b24_call('crm.timeline.comment.list', {
+            'filter': {'ENTITY_TYPE': entity_type, 'ENTITY_ID': entity_id},
+            'order': {'ID': 'ASC'}
+        })
+        if timeline and 'result' in timeline:
+            for comment in timeline['result']:
+                desc = comment.get('COMMENT')
+                promo_code = extract_promo_from_text(desc)
+                if promo_code:
+                    break
+
+    # Г. Из crm.activity (запасной вариант)
     if not promo_code:
         activities = _b24_call('crm.activity.list', {
             'filter': {'OWNER_TYPE_ID': owner_type_id, 'OWNER_ID': entity_id},
