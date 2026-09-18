@@ -128,7 +128,6 @@ def extract_and_save_promo(entity_id: int | str, entity_type: str = 'lead', text
         if comments:
             promo_code = extract_promo_from_text(comments)
 
-    # В. Из таймлайна (активностей Wazzup / сообщений)
     # В. Из таймлайна Wazzup (crm.timeline.comment — именно туда Wazzup пишет сообщения)
     if not promo_code:
         timeline = _b24_call('crm.timeline.comment.list', {
