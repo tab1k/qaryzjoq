@@ -1,32 +1,29 @@
 services:
   web:
     build: .
-    image: qaryzjoq-web
-    container_name: qaryzjoq-web
+    image: qaryzjoq-quiz-web
+    container_name: qaryzjoq-quiz-web
     restart: unless-stopped
     env_file: .env
     ports:
-      # прямой доступ по http://IP:8000 — удобно на этапе настройки.
-      # Когда заработает домен через Nginx Proxy Manager, строку можно удалить:
-      # NPM ходит в контейнер по сети proxy, наружу порт не нужен.
-      - "8000:8000"
+      # только на внутренние адреса, куда ходит Nginx Proxy Manager; наружу порт не открываем
+      - "172.17.0.1:8001:8000"
+      - "172.21.0.1:8001:8000"
     networks:
       - proxy
     volumes:
-      - db-data:/data           # файл SQLite переживает пересборку
+      - db-quiz-data:/data           # файл SQLite переживает пересборку
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request,os; urllib.request.urlopen('http://127.0.0.1:%s/' % os.environ.get('GUNICORN_PORT','8000')).read()\" || exit 1"]
+      # X-Forwarded-Proto: https — иначе при DJANGO_USE_HTTPS=True Django редиректит на https://127.0.0.1 и проверка виснет
+      test: ["CMD-SHELL", "python -c \"import urllib.request as u,os; u.urlopen(u.Request('http://127.0.0.1:%s/' % os.environ.get('GUNICORN_PORT','8000'), headers={'X-Forwarded-Proto': 'https'}), timeout=4).read()\" || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 20s
 
-# общая сеть с Nginx Proxy Manager: создать один раз командой
-#   docker network create proxy
-# и подключить к ней контейнер NPM
 networks:
   proxy:
     external: true
 
 volumes:
-  db-data:
+  db-quiz-data:

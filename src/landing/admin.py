@@ -33,11 +33,14 @@ class LeadAdmin(ModelAdmin):
         ('Заявка', {
             'fields': ('name', 'phone', 'status', 'created_at'),
         }),
+        ('Ответы в квизе', {
+            'fields': ('has_income', 'credit_types'),
+        }),
         ('Что написал клиент', {
             'fields': ('debt', 'message'),
             'classes': ('collapse',),
         }),
-        ('Расчёт с калькулятора', {
+        ('Расчёт с калькулятора / квиза', {
             'fields': ('calc_card', 'calc_debt', 'calc_payments', 'calc_income', 'calc_result'),
         }),
     )
@@ -88,8 +91,8 @@ class LeadAdmin(ModelAdmin):
 
         rows = [
             ('Сумма кредитов', money(obj.calc_debt)),
-            ('Платит сейчас в месяц', money(obj.calc_payments)),
-            ('Официальный доход', money(obj.calc_income)),
+            ('Официальный доход', obj.has_income or money(obj.calc_income)),
+            ('Типы кредитов', obj.credit_types or '—'),
             ('Новый платёж', money(obj.calc_result)),
         ]
         cells = format_html_join(

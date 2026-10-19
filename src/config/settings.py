@@ -61,14 +61,14 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', 'django-insecure-dev-key-only-for-local-us
 
 DEBUG = env_bool('DJANGO_DEBUG', False)
 
-ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', 'go.qaryzjoq.kz,qaryzjoq.kz,www.qaryzjoq.kz,31.14.27.130,localhost,127.0.0.1,qaryzjoq-web,web')
-for _h in ('go.qaryzjoq.kz', 'qaryzjoq.kz', 'www.qaryzjoq.kz', 'localhost', '127.0.0.1', 'qaryzjoq-web', 'web'):
+ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', 'quiz.qaryzjoq.kz,go.qaryzjoq.kz,qaryzjoq.kz,www.qaryzjoq.kz,89.126.193.110,31.14.27.130,localhost,127.0.0.1,qaryzjoq-web,web,testserver')
+for _h in ('quiz.qaryzjoq.kz', 'go.qaryzjoq.kz', 'qaryzjoq.kz', 'www.qaryzjoq.kz', 'localhost', '127.0.0.1', 'qaryzjoq-web', 'web', 'testserver'):
     if _h not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(_h)
 
-# схему указывать обязательно: https://go.qaryzjoq.kz
-CSRF_TRUSTED_ORIGINS = env_list('DJANGO_CSRF_TRUSTED_ORIGINS', 'https://go.qaryzjoq.kz,http://go.qaryzjoq.kz,https://qaryzjoq.kz')
-for _o in ('https://go.qaryzjoq.kz', 'http://go.qaryzjoq.kz', 'https://qaryzjoq.kz'):
+# схему указывать обязательно: https://quiz.qaryzjoq.kz
+CSRF_TRUSTED_ORIGINS = env_list('DJANGO_CSRF_TRUSTED_ORIGINS', 'https://quiz.qaryzjoq.kz,http://quiz.qaryzjoq.kz,https://go.qaryzjoq.kz,http://go.qaryzjoq.kz,https://qaryzjoq.kz')
+for _o in ('https://quiz.qaryzjoq.kz', 'http://quiz.qaryzjoq.kz', 'https://go.qaryzjoq.kz', 'http://go.qaryzjoq.kz', 'https://qaryzjoq.kz'):
     if _o not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(_o)
 

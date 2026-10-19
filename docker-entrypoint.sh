@@ -32,8 +32,10 @@ if [ "$1" = "gunicorn" ]; then
   exec gunicorn config.wsgi:application \
     --bind "0.0.0.0:${GUNICORN_PORT:-8000}" \
     --workers "${GUNICORN_WORKERS:-3}" \
-    --threads 2 \
+    --worker-class sync \
     --timeout 60 \
+    --max-requests 2000 \
+    --max-requests-jitter 200 \
     --access-logfile - \
     --error-logfile -
 fi

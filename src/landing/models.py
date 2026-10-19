@@ -17,6 +17,8 @@ class Lead(models.Model):
     calc_payments = models.BigIntegerField('Расчёт: платежи в месяц', null=True, blank=True)
     calc_income = models.BigIntegerField('Расчёт: официальный доход', null=True, blank=True)
     calc_result = models.BigIntegerField('Расчёт: новый платёж', null=True, blank=True)
+    has_income = models.CharField('Официальный доход (Да/Нет)', max_length=32, blank=True)
+    credit_types = models.CharField('Тип кредитов', max_length=128, blank=True)
 
     status = models.CharField('Статус', max_length=16, choices=Status.choices, default=Status.NEW)
     created_at = models.DateTimeField('Создана', auto_now_add=True)

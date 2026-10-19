@@ -41,7 +41,7 @@ docker compose up -d --build
 docker compose logs -f web    # миграции, сборка статики, старт gunicorn
 ```
 
-По умолчанию контейнер слушает `0.0.0.0:8000`, то есть сайт сразу доступен по `http://31.14.27.130:8000`
+По умолчанию контейнер слушает `0.0.0.0:8000`, то есть сайт сразу доступен по `http://89.126.193.110:8000`
 (не забудьте `ufw allow 8000/tcp`). Когда перед ним встанет nginx — поменяйте в `docker-compose.yml`
 проброс на `"127.0.0.1:8000:8000"`, чтобы порт не торчал наружу. База (SQLite) лежит в docker-томе `db-data`, статика собирается внутрь образа при старте — пересборка данные не трогает.
 
@@ -83,7 +83,7 @@ cd ~/qaryzjoq && docker compose up -d        # web уже подключаетс
 
 **Чтобы сертификат выпустился, обязательно:**
 
-1. A-запись домена указывает на `31.14.27.130` — проверить: `dig +short go.qaryzjoq.kz`
+1. A-запись домена указывает на `89.126.193.110` — проверить: `dig +short go.qaryzjoq.kz`
 2. Порты 80 и 443 открыты и заняты именно контейнером NPM:
    ```bash
    ufw allow 80/tcp && ufw allow 443/tcp
@@ -99,7 +99,7 @@ cd ~/qaryzjoq && docker compose up -d        # web уже подключаетс
 
 ```
 DJANGO_USE_HTTPS=True
-DJANGO_ALLOWED_HOSTS=go.qaryzjoq.kz,31.14.27.130,localhost,127.0.0.1
+DJANGO_ALLOWED_HOSTS=go.qaryzjoq.kz,89.126.193.110,31.14.27.130,localhost,127.0.0.1
 DJANGO_CSRF_TRUSTED_ORIGINS=https://go.qaryzjoq.kz
 ```
 
@@ -157,7 +157,7 @@ systemctl restart docker
 # локально
 docker build -t qaryzjoq-web .
 docker save qaryzjoq-web | gzip > qaryzjoq-web.tar.gz
-scp qaryzjoq-web.tar.gz root@31.14.27.130:~/qaryzjoq/
+scp qaryzjoq-web.tar.gz root@89.126.193.110:~/qaryzjoq/
 
 # на сервере
 docker load < qaryzjoq-web.tar.gz

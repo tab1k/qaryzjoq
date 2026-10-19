@@ -208,7 +208,11 @@ def send_lead_to_bitrix24(lead) -> bool:
         details.append(f"<b>Сумма кредитов:</b> {_format_money(lead.calc_debt)}")
     if lead.calc_payments:
         details.append(f"<b>Текущий платёж в месяц:</b> {_format_money(lead.calc_payments)}")
-    if lead.calc_income:
+    if lead.has_income:
+        details.append(f"<b>Официальный доход:</b> {lead.has_income}")
+    if lead.credit_types:
+        details.append(f"<b>Типы кредитов:</b> {lead.credit_types}")
+    if lead.calc_income and not lead.has_income:
         details.append(f"<b>Официальный доход:</b> {_format_money(lead.calc_income)}")
     if lead.calc_result:
         details.append(f"<b>Рассчитанный новый платёж:</b> {_format_money(lead.calc_result)}")
@@ -217,9 +221,9 @@ def send_lead_to_bitrix24(lead) -> bool:
     if lead.message:
         details.append(f"<b>Сообщение:</b> {lead.message}")
 
-    comments = "<br>\n".join(details) if details else "Заявка на бесплатную консультацию с сайта"
+    comments = "<br>\n".join(details) if details else "Заявка с квиза на консультацию"
 
-    title = f"Заявка с сайта: {lead.name}"
+    title = f"Квиз: {lead.name}"
     if lead.calc_result:
         title += f" (новый платёж {_format_money(lead.calc_result)})"
 
@@ -232,9 +236,9 @@ def send_lead_to_bitrix24(lead) -> bool:
             "PHONE": [{"VALUE": str(lead.phone), "VALUE_TYPE": "WORK"}],
             "COMMENTS": comments,
             "SOURCE_ID": source_id,
-            "SOURCE_DESCRIPTION": "go.qaryzjoq.kz (Калькулятор)",
+            "SOURCE_DESCRIPTION": "quiz.qaryzjoq.kz (Квиз)",
             "STATUS_ID": "NEW",
-            "UTM_SOURCE": "landing",
+            "UTM_SOURCE": "quiz",
             "UTM_MEDIUM": "website",
             "UTM_CAMPAIGN": "qaryzjoq",
         },

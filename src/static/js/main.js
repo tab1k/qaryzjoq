@@ -17,6 +17,7 @@
   var links = document.getElementById('navMenu');
   var panel = document.getElementById('navPanel');
   var burger = document.getElementById('navBurger');
+  if (!burger) return;   // на странице «Спасибо» нет меню и форм
 
   var closeMenu = function (keepLock) {
     panel.classList.remove('is-open');
@@ -207,33 +208,122 @@
 
   setupClientSlider();
 
-  /* калькулятор списания -------------------------------------------------- */
+  /* анкета: 3 вопроса вместо калькулятора ------------------------------- */
   var lastCalc = null;
-  var calcForm = document.getElementById('calcForm');
+  var quizCard = document.getElementById('quizCard');
 
-  if (calcForm) {
+  if (quizCard) {
     var MONTHS = 60;
     var DISCOUNT = 0.10;
 
     var money = function (n) {
-      return Math.round(n).toLocaleString('ru-RU').replace(/\u00a0/g, ' ') + ' ₸';
+      return Math.round(n).toLocaleString('ru-RU').replace(/ /g, ' ') + ' ₸';
     };
-    var num = function (el) {
-      return parseInt((el.value || '').replace(/\D/g, ''), 10) || 0;
+    var withSpaces = function (digits) {
+      return digits ? String(digits).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : '';
     };
 
-    // разделяем разряды прямо при вводе
-    calcForm.querySelectorAll('input').forEach(function (input) {
-      input.addEventListener('input', function () {
-        var digits = (input.value || '').replace(/\D/g, '').slice(0, 12);
-        input.value = digits ? digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : '';
+    var answers = { debt: 0, has_income: '', credit_types: '' };
+    var steps = [1, 2, 3].map(function (n) { return document.getElementById('quizStep' + n); });
+    var debtInput = document.getElementById('quizDebtInput');
+    var debtError = document.getElementById('quizDebtError');
+    var incomeError = document.getElementById('quizIncomeError');
+    var creditError = document.getElementById('quizCreditError');
+
+    var showStep = function (n) {
+      steps.forEach(function (el, i) { el.classList.toggle('is-active', i === n - 1); });
+      var pctValue = Math.round(n / 3 * 100);
+      document.getElementById('quizStepCurrent').textContent = n;
+      document.getElementById('quizStepPercent').textContent = pctValue + '%';
+      document.getElementById('quizProgressFill').style.width = pctValue + '%';
+
+      // на телефоне возвращаем карточку в зону видимости
+      var rect = quizCard.getBoundingClientRect();
+      if (rect.top < 70) window.scrollTo({ top: window.scrollY + rect.top - 90, behavior: 'smooth' });
+    };
+
+    // вопрос 1 — сумма кредитов, разряды разделяем прямо при вводе
+    debtInput.addEventListener('input', function () {
+      var digits = (debtInput.value || '').replace(/\D/g, '').slice(0, 12);
+      debtInput.value = withSpaces(digits);
+      if (digits) debtError.hidden = true;
+    });
+
+    quizCard.querySelectorAll('.quiz-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        debtInput.value = withSpaces(chip.getAttribute('data-debt'));
+        debtError.hidden = true;
       });
+    });
+
+    // процедура не подходит — показываем окно отказа, в CRM ничего не уходит
+    var MIN_DEBT = 4700000;
+    var REJECT = {
+      debt: 'Для восстановления платежеспособности сумма долга должна составлять более 4 700 000 ₸.',
+      income: 'Для восстановления платежеспособности необходимо иметь официальный подтверждённый доход. ' +
+        'Без официального дохода пройти процедуру восстановления платежеспособности не получится.',
+      credits: 'Если у вас только ипотека или только автокредит, восстановление платежеспособности вам не подходит. ' +
+        'Для прохождения процедуры у вас должны быть потребительские кредиты.'
+    };
+    var reject = function (reason) {
+      document.dispatchEvent(new CustomEvent('calc:reject', { detail: REJECT[reason] }));
+    };
+
+    // «Пройти заново» — сбрасываем ответы и возвращаемся к первому вопросу
+    document.addEventListener('quiz:restart', function () {
+      answers = { debt: 0, has_income: '', credit_types: '' };
+      lastCalc = null;
+      debtInput.value = '';
+      quizCard.querySelectorAll('.quiz-option.is-selected').forEach(function (o) { o.classList.remove('is-selected'); });
+      showStep(1);
+    });
+
+    document.getElementById('quizNext1').addEventListener('click', function () {
+      var debt = parseInt((debtInput.value || '').replace(/\D/g, ''), 10) || 0;
+      if (debt < 100000) {
+        debtError.hidden = false;
+        debtInput.focus();
+        return;
+      }
+      if (debt < MIN_DEBT) { reject('debt'); return; }
+      answers.debt = debt;
+      showStep(2);
+    });
+
+    // вопросы 2 и 3 — выбор одного варианта
+    var bindOptions = function (step, key, error, onPick) {
+      var options = steps[step - 1].querySelectorAll('.quiz-option');
+      options.forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          options.forEach(function (o) { o.classList.toggle('is-selected', o === opt); });
+          answers[key] = opt.getAttribute('data-val') || '';
+          error.hidden = true;
+          if (onPick) onPick();
+        });
+      });
+    };
+
+    var goAfterIncome = function () {
+      if (answers.has_income === 'Нет') { reject('income'); return; }
+      showStep(3);
+    };
+
+    bindOptions(2, 'has_income', incomeError, function () {
+      window.setTimeout(goAfterIncome, 260);
+    });
+    bindOptions(3, 'credit_types', creditError);
+
+    document.getElementById('quizPrev2').addEventListener('click', function () { showStep(1); });
+    document.getElementById('quizPrev3').addEventListener('click', function () { showStep(2); });
+    document.getElementById('quizNext2').addEventListener('click', function () {
+      if (!answers.has_income) { incomeError.hidden = false; return; }
+      goAfterIncome();
     });
 
     // анимация прогресса: кольцо + пошаговые галочки
     var ring = document.getElementById('calcRing');
     var pct = document.getElementById('calcPct');
-    var steps = Array.prototype.slice.call(document.querySelectorAll('#calcSteps li'));
+    var loaderSteps = Array.prototype.slice.call(document.querySelectorAll('#calcSteps li'));
     var LENGTH = 214;
     var slow = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -241,7 +331,7 @@
       var duration = slow ? 1600 : 300;
       var start = null;
 
-      steps.forEach(function (li) { li.classList.remove('is-done', 'is-active'); });
+      loaderSteps.forEach(function (li) { li.classList.remove('is-done', 'is-active'); });
       ring.style.strokeDashoffset = LENGTH;
       pct.textContent = '0%';
 
@@ -253,15 +343,15 @@
         ring.style.strokeDashoffset = LENGTH * (1 - eased);
         pct.textContent = Math.round(eased * 100) + '%';
 
-        var reached = Math.min(steps.length, Math.floor(eased * steps.length + 0.0001));
-        steps.forEach(function (li, i) {
+        var reached = Math.min(loaderSteps.length, Math.floor(eased * loaderSteps.length + 0.0001));
+        loaderSteps.forEach(function (li, i) {
           li.classList.toggle('is-done', i < reached);
           li.classList.toggle('is-active', i === reached);
         });
 
         if (p >= 1) {
           window.clearInterval(timer);
-          steps.forEach(function (li) { li.classList.add('is-done'); li.classList.remove('is-active'); });
+          loaderSteps.forEach(function (li) { li.classList.add('is-done'); li.classList.remove('is-active'); });
           window.setTimeout(done, 220);
         }
       };
@@ -270,35 +360,32 @@
       frame(Date.now());
     };
 
-    calcForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      var debt = num(document.getElementById('calcDebt'));
-      var pay = num(document.getElementById('calcPay'));
-      var income = num(document.getElementById('calcIncome'));
-      var error = document.getElementById('calcError');
-      var fields = document.getElementById('calcFields');
-      var loader = document.getElementById('calcLoader');
-
-      if (!debt) {
-        error.hidden = false;
+    document.getElementById('quizNext3').addEventListener('click', function () {
+      if (!answers.credit_types) { creditError.hidden = false; return; }
+      if (answers.credit_types === 'Только ипотека' || answers.credit_types === 'Только автокредит') {
+        reject('credits');
         return;
       }
-      error.hidden = true;
 
-      var newDebt = debt * (1 - DISCOUNT);
-      var monthly = newDebt / MONTHS;
+      var monthly = answers.debt * (1 - DISCOUNT) / MONTHS;
+      lastCalc = {
+        debt: answers.debt,
+        has_income: answers.has_income,
+        credit_types: answers.credit_types,
+        monthly: Math.round(monthly),
+        money: money
+      };
 
-      lastCalc = { debt: debt, pay: pay, income: income, monthly: Math.round(monthly), money: money };
-
-      // на время расчёта показываем прогресс вместо полей, затем открываем окно с результатом
-      calcForm.style.minHeight = calcForm.offsetHeight + 'px';
+      // на время расчёта показываем прогресс вместо вопросов, затем открываем окно с результатом
+      var fields = document.getElementById('calcFields');
+      var loader = document.getElementById('calcLoader');
+      quizCard.style.minHeight = quizCard.offsetHeight + 'px';
       fields.hidden = true;
       loader.hidden = false;
       runProgress(function () {
         loader.hidden = true;
         fields.hidden = false;
-        calcForm.style.minHeight = '';
+        quizCard.style.minHeight = '';
         document.dispatchEvent(new CustomEvent('calc:done'));
       });
     });
@@ -311,6 +398,7 @@
     var card = modal.querySelector('.modal-card');
     var body = modal.querySelector('.modal-body');
     var done = modal.querySelector('.modal-done');
+    var rejectBox = modal.querySelector('.modal-reject');
     var mForm = document.getElementById('modalForm');
     var lastFocused = null;
 
@@ -320,9 +408,9 @@
     var fillCalc = function (withCalc) {
       var map = {
         m_calc_debt: withCalc ? lastCalc.debt : '',
-        m_calc_payments: withCalc && lastCalc.pay ? lastCalc.pay : '',
-        m_calc_income: withCalc && lastCalc.income ? lastCalc.income : '',
-        m_calc_result: withCalc ? lastCalc.monthly : ''
+        m_calc_result: withCalc ? lastCalc.monthly : '',
+        m_has_income: withCalc ? lastCalc.has_income : '',
+        m_credit_types: withCalc ? lastCalc.credit_types : ''
       };
       Object.keys(map).forEach(function (id) {
         var el = document.getElementById(id);
@@ -343,6 +431,7 @@
       lastFocused = document.activeElement;
       body.hidden = false;
       done.hidden = true;
+      rejectBox.hidden = true;
       modal.hidden = false;
       document.body.classList.add('is-locked');
       var first = body.querySelector('input');
@@ -366,6 +455,21 @@
     document.addEventListener('calc:done', function () {
       fillCalc(!!lastCalc);
       openModal();
+    });
+
+    // процедура не подходит — окно отказа без формы заявки
+    document.addEventListener('calc:reject', function (e) {
+      lastFocused = document.activeElement;
+      document.getElementById('rejectText').textContent = e.detail;
+      body.hidden = true;
+      done.hidden = true;
+      rejectBox.hidden = false;
+      modal.hidden = false;
+      document.body.classList.add('is-locked');
+    });
+    modal.querySelector('[data-quiz-restart]').addEventListener('click', function () {
+      closeModal();
+      document.dispatchEvent(new CustomEvent('quiz:restart'));
     });
     modal.querySelectorAll('[data-modal-close]').forEach(function (btn) {
       btn.addEventListener('click', closeModal);
